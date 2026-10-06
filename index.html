@@ -40,6 +40,432 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#7fa8d3">
 
+
+<style id="brand-v8">
+.brandHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.brandManage{border:0;background:#edf3fb;color:#47698f;border-radius:10px;padding:9px 13px;font-weight:700;cursor:pointer}
+.brandChartWrap{height:300px;position:relative}
+.brandSelect{width:100%;height:44px;border:0;background:#f0f0ee;border-radius:10px;padding:0 12px;font:inherit;color:#303238;outline:none}
+.brandManager{position:fixed;inset:0;background:rgba(20,25,32,.28);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
+.brandManager.show{display:flex}
+.brandPanel{width:min(560px,100%);max-height:80vh;overflow:auto;background:#fbfbfa;border-radius:20px;padding:22px;box-shadow:0 30px 80px rgba(20,30,45,.22)}
+.brandPanelHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.brandPanelHead h3{margin:0}
+.brandAddRow{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:14px}
+.brandAddRow input{height:42px;border:0;background:#f0f0ee;border-radius:10px;padding:0 12px;font:inherit;outline:none}
+.brandAddRow button{border:0;border-radius:10px;background:#17181b;color:#fff;padding:0 16px;font-weight:700;cursor:pointer}
+.brandRow{display:grid;grid-template-columns:1fr auto auto;gap:7px;align-items:center;padding:8px 0;border-bottom:1px solid #ececea}
+.brandRow input{height:38px;border:0;background:#f4f4f1;border-radius:9px;padding:0 10px;font:inherit;min-width:0}
+.brandRow button{height:36px;border:0;border-radius:9px;padding:0 10px;cursor:pointer;font-weight:700}
+.brandRow .brandSave{background:#e8f0fb;color:#47698f}.brandRow .brandRemove{background:#fff0ed;color:#d65f58}
+.brandClose{border:0;background:#eee;border-radius:9px;padding:8px 11px;cursor:pointer}
+.taskBrand{font-size:10px;color:#777;margin-top:3px}
+@media(max-width:700px){.brandChartWrap{height:360px}.brandPanel{border-radius:20px 20px 0 0;position:absolute;bottom:0}.brandManager{align-items:flex-end;padding:0}}
+</style>
+
+
+<style id="brand-v10-fixes">
+/* Brand dropdown: same compact floating menu language as category filter */
+.brandPicker{position:relative;width:100%}
+.brandBtn{justify-content:flex-start!important;padding:0 14px!important}
+.brandMenu{
+  left:0!important;
+  right:auto!important;
+  top:46px!important;
+  width:100%!important;
+  max-height:260px!important;
+  padding:7px!important;
+  border:0!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:0 14px 38px rgba(28,36,48,.16)!important;
+  overflow:auto!important;
+}
+.brandOption{
+  min-height:40px!important;
+  padding:9px 12px!important;
+  border-radius:9px!important;
+  font-size:14px!important;
+}
+.brandOption:hover{background:#f0f0ee!important}
+
+/* Brand output should be the same visual size as Monthly output, not a giant report */
+.brandChartWrap{
+  height:230px!important;
+  max-height:230px!important;
+}
+@media(max-width:700px){
+  .brandChartWrap{height:240px!important;max-height:240px!important}
+}
+</style>
+
+
+<style id="brand-v11-fixes">
+/* Match Monthly output dimensions */
+.brandChartWrap{height:270px!important;max-height:270px!important}
+.brandHead{margin-bottom:0!important}
+.brandHead + .brandChartWrap{margin-top:6px}
+@media(max-width:700px){.brandChartWrap{height:280px!important;max-height:280px!important}}
+
+/* Brand picker: same compact dropdown behaviour as category */
+.brandMenu{
+  display:none!important;
+  position:absolute!important;
+  left:0!important;right:0!important;top:46px!important;
+  width:auto!important;max-height:250px!important;
+  background:#fff!important;border:1px solid #e8e8e5!important;
+  border-radius:12px!important;padding:7px!important;
+  box-shadow:0 14px 38px rgba(28,36,48,.16)!important;
+  overflow:auto!important;z-index:200!important
+}
+.brandMenu.show{display:block!important}
+.brandOption{display:flex!important;align-items:center!important;gap:10px!important;min-height:40px!important;padding:9px 12px!important;border-radius:9px!important}
+.brandOption:hover{background:#f0f0ee!important}
+
+/* Make the color editor obvious */
+.brandColor{
+  appearance:none;-webkit-appearance:none;
+  width:34px!important;height:34px!important;border:1px solid #deded9!important;
+  border-radius:9px!important;padding:3px!important;background:#fff!important;cursor:pointer!important
+}
+.brandColor::-webkit-color-swatch-wrapper{padding:0}
+.brandColor::-webkit-color-swatch{border:0;border-radius:6px}
+.brandColor::-moz-color-swatch{border:0;border-radius:6px}
+.brandPanel:before{
+  content:"Chạm ô màu để chọn màu riêng cho từng brand";
+  display:block;font-size:11px;color:#8b8e95;margin:-5px 0 10px 0
+}
+</style>
+
+
+<style id="brand-v12">
+.brandPanel{
+  width:min(470px,calc(100vw - 32px))!important;
+  max-height:68vh!important;
+  padding:18px!important;
+  border-radius:16px!important;
+}
+.brandPanelHead{margin-bottom:12px!important}
+.brandAddRow{margin-bottom:10px!important}
+.brandRow{
+  grid-template-columns:1fr 42px 42px 42px auto auto!important;
+  gap:5px!important;
+  padding:6px 0!important;
+}
+.brandRow input[id^="brand-"]{height:34px!important;font-size:13px!important}
+.rgbInput{
+  width:42px!important;height:34px!important;border:1px solid #e1e1dd!important;
+  border-radius:8px!important;background:#f7f7f4!important;padding:0 4px!important;
+  text-align:center!important;font-size:11px!important;outline:none!important
+}
+.brandSave,.brandRemove{height:34px!important;padding:0 8px!important;font-size:11px!important}
+.brandPanel:before{content:"R / G / B • 0–255"!important;margin:-4px 0 8px!important}
+@media(max-width:700px){
+ .brandPanel{width:100%!important;max-height:70vh!important;padding:16px!important}
+ .brandRow{grid-template-columns:1fr 38px 38px 38px!important}
+ .brandRow .brandSave{grid-column:1/3}.brandRow .brandRemove{grid-column:3/5}
+ .rgbInput{width:38px!important}
+}
+</style>
+
+
+<style id="brand-v13">
+/* Smaller Brand output card */
+.brandChartWrap{height:180px!important;max-height:180px!important}
+.brandHead{margin-bottom:0!important}
+@media(max-width:700px){.brandChartWrap{height:190px!important;max-height:190px!important}}
+
+/* Much smaller brand manager */
+.brandPanel{
+  width:min(410px,calc(100vw - 28px))!important;
+  max-height:58vh!important;
+  padding:15px!important;
+  border-radius:14px!important;
+}
+.brandPanelHead{margin-bottom:9px!important}
+.brandAddRow{margin-bottom:8px!important}
+.brandPanel:before{content:"Màu HEX • ví dụ #7FA4D6"!important;font-size:10px!important;margin:-3px 0 7px!important}
+.brandRow{
+  grid-template-columns:minmax(0,1fr) 102px 40px 40px!important;
+  gap:5px!important;padding:5px 0!important;
+}
+.brandRow input[id^="brand-"]{height:32px!important;font-size:12px!important}
+.hexInput{
+  width:82px!important;height:32px!important;border:1px solid #e1e1dd!important;
+  border-radius:8px!important;background:#f7f7f4!important;padding:0 7px!important;
+  font-size:11px!important;outline:none!important;text-transform:uppercase!important
+}
+.brandSave,.brandRemove{height:32px!important;padding:0 7px!important;font-size:10px!important}
+@media(max-width:700px){
+ .brandPanel{width:100%!important;max-height:60vh!important;padding:14px!important}
+ .brandRow{grid-template-columns:minmax(0,1fr) 76px 38px 38px!important}
+ .hexInput{width:76px!important}
+}
+</style>
+
+
+<style id="brand-v14">
+/* Brand report is a compact end-of-month widget, not a full-width dashboard */
+.brandHead,.brandChartWrap{max-width:920px;margin-left:auto!important;margin-right:auto!important}
+.brandChartWrap{height:190px!important;max-height:190px!important}
+.brandHead{margin-bottom:2px!important}
+@media(max-width:1000px){
+  .brandHead,.brandChartWrap{max-width:100%!important}
+}
+</style>
+
+
+<style id="brand-v15">
+/* Compact the whole Brand Output card */
+.card.monthCard:has(#brandChart){
+  width:min(1040px,calc(100% - 32px))!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  padding:24px 28px 20px!important;
+}
+.card.monthCard:has(#brandChart) .brandHead,
+.card.monthCard:has(#brandChart) .brandChartWrap{
+  max-width:920px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+@media(max-width:700px){
+  .card.monthCard:has(#brandChart){
+    width:calc(100% - 20px)!important;
+    padding:18px 16px!important;
+  }
+}
+
+/* Show the saved brand color directly in the selected brand button */
+.brandBtn.hasBrandColor{
+  border:1px solid var(--brand-color)!important;
+  background:color-mix(in srgb,var(--brand-color) 12%,white)!important;
+  color:#242424!important;
+}
+.brandBtn.hasBrandColor .brandDot{background:var(--brand-color)!important}
+</style>
+
+
+<style id="brand-v16">
+/* Brand card: same width/alignment as Monthly output and Tasks */
+.card.monthCard:has(#brandChart){
+  width:auto!important;
+  max-width:none!important;
+  margin:15px 0 0!important;
+  padding:23px 25px 19px!important;
+}
+.card.monthCard:has(#brandChart) .brandHead,
+.card.monthCard:has(#brandChart) .brandChartWrap{
+  max-width:none!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+.card.monthCard:has(#brandChart) .brandChartWrap{
+  height:180px!important;
+  max-height:180px!important;
+}
+
+/* Task row: show the actual brand color beside brand name */
+.taskBrand{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+}
+.taskBrand .brandDot{
+  width:8px!important;height:8px!important;
+  border-radius:50%!important;
+  flex:0 0 8px!important;
+}
+
+@media(max-width:700px){
+ .card.monthCard:has(#brandChart){
+   width:auto!important;
+   margin:12px 0 0!important;
+   padding:18px 16px!important;
+ }
+ .card.monthCard:has(#brandChart) .brandChartWrap{height:190px!important;max-height:190px!important}
+}
+</style>
+
+
+<style id="brand-v17">
+/* Brand Output now participates in the exact same .app stack as Monthly + Tasks */
+.card.monthCard:has(#brandChart){
+  width:100%!important;
+  max-width:none!important;
+  margin-top:15px!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  padding:23px 25px 19px!important;
+}
+.card.monthCard:has(#brandChart) .brandHead,
+.card.monthCard:has(#brandChart) .brandChartWrap{
+  width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;
+}
+.card.monthCard:has(#brandChart) .brandChartWrap{height:180px!important;max-height:180px!important}
+
+/* Visible color dot everywhere a brand is shown */
+.brandDot{
+  display:inline-block!important;width:9px!important;height:9px!important;
+  min-width:9px!important;border-radius:50%!important;flex:0 0 9px!important;
+}
+.brandOption{gap:10px!important}
+.taskBrand{display:flex!important;align-items:center!important;gap:6px!important}
+
+/* Hex field gets a tiny live swatch */
+.hexWrap{display:flex;align-items:center;gap:5px}
+.hexSwatch{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.12);flex:0 0 12px}
+@media(max-width:700px){
+ .card.monthCard:has(#brandChart){margin-top:12px!important;padding:18px 16px!important}
+}
+</style>
+
+
+<style id="brand-v18">
+/* Brand Output compact like the Today card */
+.card.monthCard:has(#brandChart){
+  padding:18px 22px 14px!important;
+}
+.card.monthCard:has(#brandChart) .brandHead{
+  margin-bottom:0!important;
+}
+.card.monthCard:has(#brandChart) .brandHead h2{
+  font-size:18px!important;
+}
+.card.monthCard:has(#brandChart) .brandHead p{
+  font-size:10px!important;
+  margin-top:3px!important;
+}
+.card.monthCard:has(#brandChart) .brandChartWrap{
+  height:105px!important;
+  max-height:105px!important;
+  margin-top:3px!important;
+}
+.card.monthCard:has(#brandChart) .brandHead button{
+  height:36px!important;
+  padding:0 14px!important;
+  font-size:12px!important;
+}
+@media(max-width:700px){
+ .card.monthCard:has(#brandChart){padding:16px!important}
+ .card.monthCard:has(#brandChart) .brandChartWrap{height:125px!important;max-height:125px!important}
+}
+</style>
+
+
+<style id="checkbox-v19">
+/* Keep the visual checkbox compact, but make its click target 44x44 */
+.check{
+  position:relative!important;
+  width:26px!important;
+  height:26px!important;
+  min-width:26px!important;
+  flex:0 0 26px!important;
+  overflow:visible!important;
+}
+.check::after{
+  content:""!important;
+  position:absolute!important;
+  width:44px!important;
+  height:44px!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  border-radius:50%!important;
+}
+.check:hover::after{
+  background:rgba(91,141,239,.07)!important;
+}
+@media (pointer:coarse){
+  .check::after{
+    width:48px!important;
+    height:48px!important;
+  }
+}
+</style>
+
+
+<style id="checkbox-v20-fix">
+/* Invisible hit area must stay BEHIND the visible checkmark */
+.check{
+  position:relative!important;
+  z-index:1!important;
+}
+.check::after{
+  z-index:-1!important;
+  pointer-events:none!important;
+}
+.check.done,
+.check[aria-checked="true"]{
+  color:#fff!important;
+}
+</style>
+
+
+<style id="checkbox-v21-real-hitbox">
+/* Real 44x44 hit target. The checkbox itself stays visually 21x21. */
+.checkHit{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  display:grid!important;
+  place-items:center!important;
+  cursor:pointer!important;
+  border-radius:50%!important;
+  align-self:center!important;
+  outline:none!important;
+}
+.checkHit:hover{background:rgba(91,141,239,.07)!important}
+.checkHit:focus-visible{box-shadow:0 0 0 3px rgba(91,141,239,.18)!important}
+
+/* Restore original visual checkbox/checkmark logic */
+.checkHit .check{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  width:21px!important;
+  height:21px!important;
+  min-width:21px!important;
+  border:1.6px solid #c7c7c4!important;
+  border-radius:50%!important;
+  display:grid!important;
+  place-items:center!important;
+  margin:0!important;
+  padding:0!important;
+  pointer-events:none!important;
+  background:transparent;
+  position:relative!important;
+  overflow:hidden!important;
+}
+.checkHit .check::before{content:none!important}
+.checkHit .check::after{content:none!important}
+.checkHit .check:checked{
+  background:var(--post)!important;
+  border-color:var(--post)!important;
+}
+.checkHit .check:checked::after{
+  content:"✓"!important;
+  display:block!important;
+  color:#fff!important;
+  font-size:12px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  position:static!important;
+  width:auto!important;
+  height:auto!important;
+  transform:none!important;
+  background:none!important;
+  border-radius:0!important;
+  z-index:auto!important;
+}
+
+/* Old V19/V20 pseudo hitbox is disabled */
+.checkHit .check:hover::after{background:none!important}
+
+@media(pointer:coarse){
+  .checkHit{width:48px!important;height:48px!important;min-width:48px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -57,13 +483,31 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
     </div><div class="filter"><button class="filterBtn categoryFilter" id="categoryFilterBtn" onclick="toggleMenu()"><span id="filterText">Tất cả</span></button><div class="menu" id="menu"><button onclick="chooseFilter('',this)">Tất cả</button><button onclick="chooseFilter('Edit Video',this)">Edit Video</button><button onclick="chooseFilter('Design',this)">Design</button><button onclick="chooseFilter('Đăng Bài',this)">Đăng Bài</button><button onclick="chooseFilter('Feedback',this)">Feedback</button></div></div></div>
   <div id="tasks"></div>
  </section>
+<section class="card monthCard">
+  <div class="brandHead"><div><h2 style="margin:0">Brand output</h2><div class="small" id="brandMonthText">Completed tasks by brand this month</div></div><button class="brandManage" onclick="openBrandManager()">Manage brands</button></div>
+  <div class="brandChartWrap"><canvas id="brandChart"></canvas></div>
+ </section>
+
 </div>
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
  <div class="modalHead"><h3 id="modalTitle">Thêm công việc</h3><button class="delete" id="deleteBtn" onclick="deleteEditing()" style="display:none">Xóa task</button></div>
- <div class="fields"><input id="name" placeholder="Tên công việc"><div class="datePicker"><button type="button" class="dateField" onclick="toggleCalendar(event)"><span id="dateDisplay"></span><span>▣</span></button><div class="calendarPopup" id="calendarPopup"><div class="calNav"><button onclick="changeMonth(-1)">‹</button><strong id="calMonth"></strong><button onclick="changeMonth(1)">›</button></div><div class="calWeek"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div><div class="calDays" id="calDays"></div><div class="calFoot"><button onclick="pickDate(TODAY)">Hôm nay</button></div></div></div><input id="note" placeholder="Brand / ghi chú">
+ <div class="fields"><input id="name" placeholder="Tên công việc"><div class="datePicker"><button type="button" class="dateField" onclick="toggleCalendar(event)"><span id="dateDisplay"></span><span>▣</span></button><div class="calendarPopup" id="calendarPopup"><div class="calNav"><button onclick="changeMonth(-1)">‹</button><strong id="calMonth"></strong><button onclick="changeMonth(1)">›</button></div><div class="calWeek"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div><div class="calDays" id="calDays"></div><div class="calFoot"><button onclick="pickDate(TODAY)">Hôm nay</button></div></div></div><div class="brandPicker">
+  <button type="button" id="brandBtn" class="brandSelect brandBtn" onclick="toggleBrandPicker()">Chọn brand (không bắt buộc)</button>
+  <input type="hidden" id="brandSelect" value="">
+  <div class="brandMenu" id="brandMenu"></div>
+</div><input id="note" placeholder="Ghi chú">
  <div class="choices"><button class="choice video active" data-cat="Edit Video" onclick="chooseCat(this)">Edit Video</button><button class="choice design" data-cat="Design" onclick="chooseCat(this)">Design</button><button class="choice post" data-cat="Đăng Bài" onclick="chooseCat(this)">Đăng Bài</button><button class="choice feedback" data-cat="Feedback" onclick="chooseCat(this)">Feedback</button></div></div>
  <div class="actions"><button class="cancel" onclick="closeModal()">Hủy</button><button class="saveBtn" id="saveBtn" onclick="saveTask()">Thêm task</button></div>
 </div></div>
+
+<div class="brandManager" id="brandManager" onclick="if(event.target===this)closeBrandManager()">
+ <div class="brandPanel">
+  <div class="brandPanelHead"><h3>Brands</h3><button class="brandClose" onclick="closeBrandManager()">Đóng</button></div>
+  <div class="brandAddRow"><input id="newBrandName" placeholder="Tên brand mới"><button onclick="addBrand()">＋ Thêm</button></div>
+  <div id="brandRows"></div>
+ </div>
+</div>
+
 <script>
 Chart.register(ChartDataLabels);
 const $=s=>document.querySelector(s),KEY='phong-work-v6',COLORS={'Edit Video':'#5b8def','Design':'#a477e8','Đăng Bài':'#58b88a','Feedback':'#f2a65a'};
@@ -71,15 +515,20 @@ const iso=d=>{let x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset(
 const SUPABASE_URL='https://ojjzdhkdmvgegdvlvmrm.supabase.co';
 const SUPABASE_KEY='sb_publishable_JoCupAY95g3R_SylOnu2JA_h0405dY_';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let tasks=[];
-let mode='today',filter='',monthFilter='',monthMenuYear=new Date().getFullYear(),selectedCat='Edit Video',selectedDate=TODAY,calendarCursor=new Date(),editingId=null,chart;
+let tasks=[],brands=[];
+let mode='today',filter='',monthFilter='',monthMenuYear=new Date().getFullYear(),selectedCat='Edit Video',selectedDate=TODAY,calendarCursor=new Date(),editingId=null,chart,brandChart;
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function setSaveState(t){$('#saveState').textContent=t}
 async function loadTasks(){
  setSaveState('● Syncing...');
- const {data,error}=await db.from('tasks').select('*').order('task_date',{ascending:true});
- if(error){setSaveState('● Sync error');console.error(error);return}
- tasks=(data||[]).map(r=>({id:r.id,name:r.name,date:r.task_date,cat:r.category,note:r.note||'',done:r.done}));
+ const [taskRes,brandRes]=await Promise.all([
+   db.from('tasks').select('*,brands(id,name)').order('task_date',{ascending:true}),
+   db.from('brands').select('*').order('name',{ascending:true})
+ ]);
+ if(taskRes.error||brandRes.error){setSaveState('● Sync error');console.error(taskRes.error||brandRes.error);return}
+ brands=brandRes.data||[];
+ tasks=(taskRes.data||[]).map(r=>({id:r.id,name:r.name,date:r.task_date,cat:r.category,note:r.note||'',done:r.done,brandId:r.brand_id||null,brand:r.brands?.name||''}));
+ renderBrandSelect();
  setSaveState('● Synced');renderTasks()
 }
 function dateLabel(v){return new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(v+'T00:00:00'))}
@@ -87,9 +536,111 @@ function setMode(el){mode=el.dataset.mode;document.querySelectorAll('.tab').forE
 function currentMonthDone(){let n=new Date(),y=n.getFullYear(),m=n.getMonth();return tasks.filter(t=>{let d=new Date(t.date+'T00:00:00');return t.done&&d.getFullYear()===y&&d.getMonth()===m})}
 function updateDashboard(){let a=tasks.filter(t=>t.date===TODAY),d=a.filter(t=>t.done).length,p=a.length?Math.round(d/a.length*100):0;$('#todayText').textContent=`${d} / ${a.length} tasks completed`;$('#todayPct').textContent=p+'%';requestAnimationFrame(()=>$('#todayFill').style.width=p+'%');
  let cats=Object.keys(COLORS),month=currentMonthDone(),counts=cats.map(c=>month.filter(t=>t.cat===c).length);$('#monthTotal').textContent=month.length;$('#legend').innerHTML=cats.map((c,i)=>`<div class="legendItem" onclick="quickFilter('${c}')"><b>${counts[i]}</b><span><i style="background:${COLORS[c]}"></i>${c}</span></div>`).join('');
- if(chart)chart.destroy();chart=new Chart($('#chart'),{type:'bar',data:{labels:cats,datasets:[{data:counts,backgroundColor:cats.map(c=>COLORS[c]),borderRadius:10,borderSkipped:false,maxBarThickness:70}]},options:{animation:{duration:650,easing:'easeOutQuart'},layout:{padding:{top:24}},responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#303238',font:{size:12,weight:'700'},formatter:v=>v},tooltip:{displayColors:false,callbacks:{label:c=>c.raw+' tasks'}}},scales:{y:{beginAtZero:true,ticks:{precision:0,color:'#999',font:{size:9}},grid:{color:'#ededeb'},border:{display:false}},x:{ticks:{color:'#666',font:{size:9,weight:'600'}},grid:{display:false},border:{display:false}}}}})}
+ if(chart)chart.destroy();chart=new Chart($('#chart'),{type:'bar',data:{labels:cats,datasets:[{data:counts,backgroundColor:cats.map(c=>COLORS[c]),borderRadius:10,borderSkipped:false,maxBarThickness:70}]},options:{animation:{duration:650,easing:'easeOutQuart'},layout:{padding:{top:24}},responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#303238',font:{size:12,weight:'700'},formatter:v=>v},tooltip:{displayColors:false,callbacks:{label:c=>c.raw+' tasks'}}},scales:{y:{beginAtZero:true,ticks:{precision:0,color:'#999',font:{size:9}},grid:{color:'#ededeb'},border:{display:false}},x:{ticks:{color:'#666',font:{size:9,weight:'600'}},grid:{display:false},border:{display:false}}}}});updateBrandChart()}
+
+function renderBrandSelect(){
+ const hidden=$('#brandSelect'),btn=$('#brandBtn'),menu=$('#brandMenu');if(!hidden||!btn||!menu)return;
+ const current=hidden.value;
+ const active=brands.filter(b=>b.active);
+ menu.innerHTML=`<div class="brandOption" onclick="pickBrand('')"><span class="brandDot" style="background:#d7d9dc"></span>Không chọn brand</div>`+
+ active.map(b=>`<div class="brandOption" onclick="pickBrand('${b.id}')"><span class="brandDot" style="background:${b.color||'#7FA4D6'}"></span>${esc(b.name)}</div>`).join('');
+ const b=brands.find(x=>String(x.id)===String(current));
+ if(b){
+   const c=b.color||'#7FA4D6';
+   btn.innerHTML=`<span class="brandDot"></span>${esc(b.name)}`;
+   btn.classList.add('hasBrandColor');
+   btn.style.setProperty('--brand-color',c);
+ }else{
+   btn.innerHTML='Chọn brand (không bắt buộc)';
+   btn.classList.remove('hasBrandColor');
+   btn.style.removeProperty('--brand-color');
+ }
+}
+function toggleBrandPicker(){
+ const menu=$('#brandMenu');
+ menu.classList.toggle('show');
+}
+function pickBrand(id){
+ $('#brandSelect').value=id;
+ $('#brandMenu').classList.remove('show');
+ renderBrandSelect();
+}
+function updateBrandChart(){
+ const n=new Date(),y=n.getFullYear(),m=n.getMonth();
+ const done=tasks.filter(t=>{let d=new Date(t.date+'T00:00:00');return t.done&&d.getFullYear()===y&&d.getMonth()===m&&t.brandId});
+ const counts={};done.forEach(t=>counts[t.brand]=(counts[t.brand]||0)+1);
+ const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+ const labels=rows.length?rows.map(x=>x[0]):['Chưa có dữ liệu'];
+ const data=rows.length?rows.map(x=>x[1]):[0];
+ const brandColors=rows.length?rows.map(x=>{
+   const sample=done.find(t=>t.brand===x[0]);
+   return taskBrandColor(sample||{brand:x[0]});
+ }):['#d9dde3'];
+ if(brandChart)brandChart.destroy();
+ brandChart=new Chart($('#brandChart'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:brandColors,borderRadius:8,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:24,left:4,top:4,bottom:0}},plugins:{legend:{display:false},datalabels:{anchor:'end',align:'right',color:'#303238',font:{weight:'700'},formatter:v=>v},tooltip:{displayColors:false,callbacks:{label:c=>c.raw+' tasks'}}},scales:{x:{beginAtZero:true,ticks:{precision:0},grid:{color:'#ededeb'},border:{display:false}},y:{grid:{display:false},border:{display:false},ticks:{color:'#555',font:{size:10,weight:'600'},autoSkip:false}}}}})
+}
+function openBrandManager(){renderBrandRows();$('#brandManager').classList.add('show');setTimeout(()=>$('#newBrandName').focus(),100)}
+function closeBrandManager(){$('#brandManager').classList.remove('show')}
+
+function normalizeHex(v){
+ v=(v||'').trim().replace(/^#/,'');
+ if(/^[0-9a-fA-F]{3}$/.test(v))v=v.split('').map(x=>x+x).join('');
+ if(!/^[0-9a-fA-F]{6}$/.test(v))return null;
+ return '#'+v.toUpperCase();
+}
+function renderBrandRows(){
+ $('#brandRows').innerHTML=brands.filter(b=>b.active).map(b=>`<div class="brandRow">
+   <input id="brand-${b.id}" value="${esc(b.name)}">
+   <div class="hexWrap"><span class="hexSwatch" id="swatch-${b.id}" style="background:${b.color||'#7FA4D6'}"></span><input class="hexInput" id="brandHex-${b.id}" value="${(b.color||'#7FA4D6').toUpperCase()}" maxlength="7" placeholder="#7FA4D6" oninput="previewBrandHex(${b.id},this.value)" onchange="saveBrandHex(${b.id},this.value)"></div>
+   <button class="brandSave" onclick="renameBrand(${b.id})">Lưu</button>
+   <button class="brandRemove" onclick="removeBrand(${b.id})">Xóa</button>
+ </div>`).join('')||'<div class="empty">Chưa có brand.</div>'
+}
+
+function previewBrandHex(id,v){
+ const c=normalizeHex(v),sw=$('#swatch-'+id);
+ if(sw)sw.style.background=c||'#D9DDE3';
+}
+async function saveBrandHex(id,v){
+ const color=normalizeHex(v);if(!color)return;
+ const {error}=await db.from('brands').update({color}).eq('id',id);
+ if(error){setSaveState('● Sync error');return}
+ const b=brands.find(x=>x.id===id);if(b)b.color=color;
+ const inp=$('#brandHex-'+id);if(inp)inp.value=color;
+ previewBrandHex(id,color);renderBrandSelect();updateBrandChart();renderTasks();setSaveState('● Synced');
+}
+
+async function addBrand(){
+ const name=$('#newBrandName').value.trim();if(!name)return;
+ const {error}=await db.from('brands').insert({name});
+ if(error){alert(error.code==='23505'?'Brand này đã có rồi.':'Không thêm được brand.');return}
+ $('#newBrandName').value='';await loadTasks();renderBrandRows()
+}
+
+async function renameBrand(id){
+ const name=$('#brand-'+id).value.trim();if(!name)return;
+ const color=normalizeHex($('#brandHex-'+id).value); if(!color){alert('Mã màu chưa đúng. Ví dụ: #7FA4D6 hoặc #FFF');return} const {error}=await db.from('brands').update({name,color}).eq('id',id);
+ if(error){alert(error.code==='23505'?'Tên brand bị trùng.':'Không sửa được brand.');return}
+ await loadTasks();renderBrandRows()
+}
+async function removeBrand(id){
+ const used=tasks.some(t=>t.brandId===id);
+ const msg=used?'Brand này đã có task cũ. Xóa khỏi danh sách chọn nhưng vẫn giữ nguyên task và báo cáo cũ?':'Xóa brand này khỏi danh sách?';
+ if(!confirm(msg))return;
+ const {error}=await db.from('brands').update({active:false}).eq('id',id);
+ if(error){alert('Không xóa được brand.');return}
+ await loadTasks();renderBrandRows()
+}
+
 function filtered(){let q=$('#search').value.toLowerCase(),mon=monthFilter;return tasks.filter(t=>{let scope=mode==='today'?t.date===TODAY:mode==='done'?t.done:true;return scope&&(!filter||t.cat===filter)&&(!mon||t.date.startsWith(mon))&&t.name.toLowerCase().includes(q)}).sort((a,b)=>a.date.localeCompare(b.date)||a.done-b.done)}
-function renderTasks(){let a=filtered(),groups={};a.forEach(t=>(groups[t.date]??=[]).push(t));$('#tasks').innerHTML=a.length?Object.entries(groups).map(([date,items])=>`<div class="groupHead"><strong>${date===TODAY?'Hôm nay':dateLabel(date)}</strong><span>${items.filter(x=>x.done).length}/${items.length} done</span></div>`+items.map((t,i)=>`<div class="task ${t.done?'done':''}" style="animation-delay:${i*25}ms" onclick="editTask(${t.id})"><input class="check" type="checkbox" ${t.done?'checked':''} onclick="event.stopPropagation()" onchange="toggle(${t.id})"><div><div class="taskTitle">${esc(t.name)}</div><div class="taskNote">${esc(t.note)}</div></div><div class="cat"><span class="dot" style="background:${COLORS[t.cat]}"></span>${esc(t.cat)}</div><div class="meta ${!t.done&&t.date<TODAY?'overdue':''}">${!t.done&&t.date<TODAY?'OVERDUE · ':''}${dateLabel(t.date)}</div><button class="more" onclick="event.stopPropagation();editTask(${t.id})">⋯</button></div>`).join('')).join(''):'<div class="empty">Không có task phù hợp.</div>';updateDashboard()}
+
+function taskBrandColor(t){
+ const b=brands.find(x=>String(x.id)===String(t.brandId))||
+         brands.find(x=>x.name===t.brand);
+ return b?.color||'#B8BEC6';
+}
+
+function renderTasks(){let a=filtered(),groups={};a.forEach(t=>(groups[t.date]??=[]).push(t));$('#tasks').innerHTML=a.length?Object.entries(groups).map(([date,items])=>`<div class="groupHead"><strong>${date===TODAY?'Hôm nay':dateLabel(date)}</strong><span>${items.filter(x=>x.done).length}/${items.length} done</span></div>`+items.map((t,i)=>`<div class="task ${t.done?'done':''}" style="animation-delay:${i*25}ms" onclick="editTask(${t.id})"><span class="checkHit" role="checkbox" aria-checked="${t.done?'true':'false'}" tabindex="0" onclick="event.stopPropagation();toggle(${t.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();toggle(${t.id})}"><input class="check" type="checkbox" ${t.done?'checked':''} tabindex="-1" aria-hidden="true"></span><div><div class="taskTitle">${esc(t.name)}</div><div class="taskNote">${esc(t.note)}</div>${t.brand?`<div class="taskBrand"><span class="brandDot" style="background:${taskBrandColor(t)}"></span>${esc(t.brand)}</div>`:''}</div><div class="cat"><span class="dot" style="background:${COLORS[t.cat]}"></span>${esc(t.cat)}</div><div class="meta ${!t.done&&t.date<TODAY?'overdue':''}">${!t.done&&t.date<TODAY?'OVERDUE · ':''}${dateLabel(t.date)}</div><button class="more" onclick="event.stopPropagation();editTask(${t.id})">⋯</button></div>`).join('')).join(''):'<div class="empty">Không có task phù hợp.</div>';updateDashboard()}
 async function toggle(id){
  let t=tasks.find(x=>x.id===id),next=!t.done;t.done=next;renderTasks();setSaveState('● Saving...');
  const {error}=await db.from('tasks').update({done:next}).eq('id',id);
@@ -112,13 +663,13 @@ function changeMonthYear(n){monthMenuYear+=n;renderMonthMenu()}
 function pickMonth(v,label){monthFilter=v;$('#monthFilterText').textContent=label;document.querySelector('.monthPicker').classList.remove('open');renderTasks()}
 function chooseCat(el){selectedCat=el.dataset.cat;document.querySelectorAll('.choice').forEach(x=>x.classList.remove('active'));el.classList.add('active');$('#saveBtn').style.background=COLORS[selectedCat]}
 function setCat(c){selectedCat=c;document.querySelectorAll('.choice').forEach(x=>x.classList.toggle('active',x.dataset.cat===c));$('#saveBtn').style.background=COLORS[c]}
-function openModal(){editingId=null;selectedDate=TODAY;calendarCursor=new Date();$('#modalTitle').textContent='Thêm công việc';$('#saveBtn').textContent='Thêm task';$('#deleteBtn').style.display='none';$('#name').value='';$('#note').value='';$('#dateDisplay').textContent=dateLabel(TODAY);setCat('Edit Video');renderCalendar();$('#overlay').classList.add('show');setTimeout(()=>$('#name').focus(),180)}
-function editTask(id){let t=tasks.find(x=>x.id===id);editingId=id;selectedDate=t.date;calendarCursor=new Date(t.date+'T00:00:00');$('#modalTitle').textContent='Chỉnh sửa công việc';$('#saveBtn').textContent='Lưu thay đổi';$('#deleteBtn').style.display='block';$('#name').value=t.name;$('#note').value=t.note||'';$('#dateDisplay').textContent=dateLabel(t.date);setCat(t.cat);renderCalendar();$('#overlay').classList.add('show')}
+function openModal(){editingId=null;selectedDate=TODAY;calendarCursor=new Date();$('#modalTitle').textContent='Thêm công việc';$('#saveBtn').textContent='Thêm task';$('#deleteBtn').style.display='none';$('#name').value='';$('#note').value='';$('#brandSelect').value='';renderBrandSelect();$('#dateDisplay').textContent=dateLabel(TODAY);setCat('Edit Video');renderCalendar();$('#overlay').classList.add('show');setTimeout(()=>$('#name').focus(),180)}
+function editTask(id){let t=tasks.find(x=>x.id===id);editingId=id;selectedDate=t.date;calendarCursor=new Date(t.date+'T00:00:00');$('#modalTitle').textContent='Chỉnh sửa công việc';$('#saveBtn').textContent='Lưu thay đổi';$('#deleteBtn').style.display='block';$('#name').value=t.name;$('#note').value=t.note||'';$('#brandSelect').value=t.brandId||'';renderBrandSelect();$('#dateDisplay').textContent=dateLabel(t.date);setCat(t.cat);renderCalendar();$('#overlay').classList.add('show')}
 function closeModal(){$('#overlay').classList.remove('show');$('#calendarPopup').classList.remove('open')}
 async function saveTask(){
  let name=$('#name').value.trim();if(!name)return $('#name').focus();
  setSaveState('● Saving...');
- const payload={name,task_date:selectedDate,category:selectedCat,note:$('#note').value.trim()};
+ const payload={name,task_date:selectedDate,category:selectedCat,note:$('#note').value.trim(),brand_id:$('#brandSelect').value?Number($('#brandSelect').value):null};
  let res;
  if(editingId) res=await db.from('tasks').update(payload).eq('id',editingId).select().single();
  else res=await db.from('tasks').insert({...payload,done:false}).select().single();
@@ -135,5 +686,10 @@ async function deleteEditing(){
 function toggleCalendar(e){e.stopPropagation();$('#calendarPopup').classList.toggle('open');renderCalendar()}function renderCalendar(){let y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),first=new Date(y,m,1),start=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),out='';$('#calMonth').textContent=new Intl.DateTimeFormat('vi-VN',{month:'long',year:'numeric'}).format(first);for(let i=start-1;i>=0;i--)out+=calBtn(new Date(y,m-1,prev-i),true);for(let d=1;d<=days;d++)out+=calBtn(new Date(y,m,d),false);let tail=(7-(start+days)%7)%7;for(let d=1;d<=tail;d++)out+=calBtn(new Date(y,m+1,d),true);$('#calDays').innerHTML=out}
 function calBtn(d,dim){let k=iso(d);return `<button type="button" class="${dim?'dim ':''}${k===selectedDate?'selected ':''}${k===TODAY?'today':''}" onclick="pickDate('${k}')">${d.getDate()}</button>`}function pickDate(k){selectedDate=k;calendarCursor=new Date(k+'T00:00:00');$('#dateDisplay').textContent=dateLabel(k);$('#calendarPopup').classList.remove('open');renderCalendar()}function changeMonth(n){calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+n,1);renderCalendar()}
 document.addEventListener('click',e=>{if(!e.target.closest('.filter')){$('#menu').classList.remove('open');document.querySelector('.filter').classList.remove('open')}if(!e.target.closest('.monthPicker'))document.querySelector('.monthPicker').classList.remove('open');if(!e.target.closest('.datePicker'))$('#calendarPopup').classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric'}).format(now);$('#monthText').textContent=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(now);loadTasks();
+let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric'}).format(now);$('#monthText').textContent=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(now);document.addEventListener('click',e=>{
+ const picker=document.querySelector('.brandPicker');
+ const menu=document.querySelector('#brandMenu');
+ if(picker&&menu&&!picker.contains(e.target))menu.classList.remove('show');
+});
+loadTasks();
 </script></body></html>
