@@ -499,7 +499,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
   <div class="brandHead"><div><h2 style="margin:0">Video output</h2><div class="small" id="brandMonthText">Completed Edit Video by brand this month</div></div><button class="brandManage" onclick="openBrandManager()">Manage brands</button></div>
   <div class="brandChartWrap"><canvas id="brandChart"></canvas></div>
  </section>
-<section class="card monthCard"><div class="brandHead"><div><h2 style="margin:0">Posting output</h2><div class="small">Completed Đăng Bài by platform this month</div></div><div class="total"><strong id="postingTotal">0</strong><span>POSTING TASKS</span></div></div><div class="brandChartWrap"><canvas id="postingChart"></canvas></div></section>
+<section class="card monthCard"><div class="brandHead"><div><h2 style="margin:0">Posting output</h2><div class="small" id="postingMonthText">Completed Đăng Bài by platform this month</div></div><div style="display:flex;align-items:center;gap:10px"><div class="monthPicker postingMonthPicker"><button class="monthBtn" id="postingMonthBtn" type="button" onclick="togglePostingMonthMenu(event)"><span id="postingMonthFilterText">Tháng hiện tại</span></button><div class="monthMenu" id="postingMonthMenu"></div></div><div class="total"><strong id="postingTotal">0</strong><span>POSTING TASKS</span></div></div></div><div class="brandChartWrap"><canvas id="postingChart"></canvas></div></section>
 
 </div>
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal">
@@ -529,7 +529,7 @@ const SUPABASE_URL='https://ojjzdhkdmvgegdvlvmrm.supabase.co';
 const SUPABASE_KEY='sb_publishable_JoCupAY95g3R_SylOnu2JA_h0405dY_';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let tasks=[],brands=[];
-let mode='today',filter='',monthFilter='',monthMenuYear=new Date().getFullYear(),selectedCat='Edit Video',selectedDate=TODAY,calendarCursor=new Date(),editingId=null,chart,brandChart,postingChart;
+let mode='today',filter='',monthFilter='',reportMonth=iso(new Date()).slice(0,7),monthMenuYear=new Date().getFullYear(),selectedCat='Edit Video',selectedDate=TODAY,calendarCursor=new Date(),editingId=null,chart,brandChart,postingChart;
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function setSaveState(t){$('#saveState').textContent=t}
 async function loadTasks(){
@@ -546,7 +546,7 @@ async function loadTasks(){
 }
 function dateLabel(v){return new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(v+'T00:00:00'))}
 function setMode(el){mode=el.dataset.mode;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderTasks()}
-function currentMonthDone(){let n=new Date(),y=n.getFullYear(),m=n.getMonth();return tasks.filter(t=>{let d=new Date(t.date+'T00:00:00');return t.done&&d.getFullYear()===y&&d.getMonth()===m})}
+function currentMonthDone(){return tasks.filter(t=>t.done&&t.date.startsWith(reportMonth))}
 function updateDashboard(){let a=tasks.filter(t=>t.date===TODAY),d=a.filter(t=>t.done).length,p=a.length?Math.round(d/a.length*100):0;$('#todayText').textContent=`${d} / ${a.length} tasks completed`;$('#todayPct').textContent=p+'%';requestAnimationFrame(()=>$('#todayFill').style.width=p+'%');
  let cats=Object.keys(COLORS),month=currentMonthDone(),counts=cats.map(c=>month.filter(t=>t.cat===c).length);$('#monthTotal').textContent=month.length;$('#legend').innerHTML=cats.map((c,i)=>`<div class="legendItem" onclick="quickFilter('${c}')"><b>${counts[i]}</b><span><i style="background:${COLORS[c]}"></i>${c}</span></div>`).join('');
  if(chart)chart.destroy();chart=new Chart($('#chart'),{type:'bar',data:{labels:cats,datasets:[{data:counts,backgroundColor:cats.map(c=>COLORS[c]),borderRadius:10,borderSkipped:false,maxBarThickness:70}]},options:{animation:{duration:650,easing:'easeOutQuart'},layout:{padding:{top:24}},responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#303238',font:{size:12,weight:'700'},formatter:v=>v},tooltip:{displayColors:false,callbacks:{label:c=>c.raw+' tasks'}}},scales:{y:{beginAtZero:true,ticks:{precision:0,color:'#999',font:{size:9}},grid:{color:'#ededeb'},border:{display:false}},x:{ticks:{color:'#666',font:{size:9,weight:'600'}},grid:{display:false},border:{display:false}}}}});updateBrandChart();updatePostingChart()}
@@ -579,8 +579,7 @@ function pickBrand(id){
  renderBrandSelect();
 }
 function updateBrandChart(){
- const n=new Date(),y=n.getFullYear(),m=n.getMonth();
- const done=tasks.filter(t=>{let d=new Date(t.date+'T00:00:00');return t.done&&t.cat==='Edit Video'&&d.getFullYear()===y&&d.getMonth()===m&&t.brandId});
+ const done=tasks.filter(t=>t.done&&t.cat==='Edit Video'&&t.date.startsWith(reportMonth)&&t.brandId);
  const counts={};done.forEach(t=>counts[t.brand]=(counts[t.brand]||0)+1);
  const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
  const labels=rows.length?rows.map(x=>x[0]):['Chưa có dữ liệu'];
@@ -594,11 +593,33 @@ function updateBrandChart(){
 }
 
 function updatePostingChart(){
- const n=new Date(),y=n.getFullYear(),m=n.getMonth();
- const posts=tasks.filter(t=>{const d=new Date(t.date+'T00:00:00');return t.done&&t.cat==='Đăng Bài'&&d.getFullYear()===y&&d.getMonth()===m});
+ const posts=tasks.filter(t=>t.done&&t.cat==='Đăng Bài'&&t.date.startsWith(reportMonth));
  const labels=['FB/IG','Pinterest','YouTube','TikTok'],data=labels.map(p=>posts.filter(t=>(t.platforms||[]).includes(p)).length);
  $('#postingTotal').textContent=posts.length;if(postingChart)postingChart.destroy();
  postingChart=new Chart($('#postingChart'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:['#5B8DEF','#A477E8','#FF5B57','#58B88A'],borderRadius:8,borderSkipped:false,maxBarThickness:70}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:20}},plugins:{legend:{display:false},datalabels:{anchor:'end',align:'top',color:'#303238',font:{size:11,weight:'700'},formatter:v=>v}},scales:{y:{beginAtZero:true,ticks:{precision:0},grid:{color:'#ededeb'},border:{display:false}},x:{grid:{display:false},border:{display:false}}}}})
+}
+
+
+function togglePostingMonthMenu(e){
+ e.stopPropagation();
+ document.querySelector('.postingMonthPicker').classList.toggle('open');
+ renderPostingMonthMenu();
+}
+function renderPostingMonthMenu(){
+ const months=['Thg 1','Thg 2','Thg 3','Thg 4','Thg 5','Thg 6','Thg 7','Thg 8','Thg 9','Thg 10','Thg 11','Thg 12'];
+ $('#postingMonthMenu').innerHTML=`<div class="monthMenuHead"><button type="button" onclick="event.stopPropagation();postingYear(-1)">‹</button><strong>${monthMenuYear}</strong><button type="button" onclick="event.stopPropagation();postingYear(1)">›</button></div><div class="monthGrid">${months.map((m,i)=>{const v=monthMenuYear+'-'+String(i+1).padStart(2,'0');return `<button type="button" class="${reportMonth===v?'selected':''}" onclick="event.stopPropagation();pickPostingMonth('${v}','${m} ${monthMenuYear}')">${m}</button>`}).join('')}</div>`;
+}
+function postingYear(n){monthMenuYear+=n;renderPostingMonthMenu()}
+function pickPostingMonth(v,label){
+ reportMonth=v;
+ $('#postingMonthFilterText').textContent=label;
+ document.querySelector('.postingMonthPicker').classList.remove('open');
+ const [y,m]=v.split('-').map(Number),d=new Date(y,m-1,1);
+ const reportLabel=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(d);
+ $('#monthText').textContent=reportLabel;
+ $('#brandMonthText').textContent='Completed Edit Video by brand · '+reportLabel;
+ $('#postingMonthText').textContent='Completed Đăng Bài by platform · '+reportLabel;
+ updateDashboard();
 }
 
 function openBrandManager(){renderBrandRows();$('#brandManager').classList.add('show');setTimeout(()=>$('#newBrandName').focus(),100)}
@@ -654,7 +675,7 @@ async function removeBrand(id){
  await loadTasks();renderBrandRows()
 }
 
-function filtered(){let q=$('#search').value.toLowerCase(),mon=monthFilter;return tasks.filter(t=>{let scope=mode==='today'?t.date===TODAY:mode==='done'?t.done:true;return scope&&(!filter||t.cat===filter)&&(!mon||t.date.startsWith(mon))&&t.name.toLowerCase().includes(q)}).sort((a,b)=>a.date.localeCompare(b.date)||a.done-b.done)}
+function filtered(){let q=$('#search').value.toLowerCase(),mon=monthFilter;return tasks.filter(t=>{let scope=mode==='today'?t.date===TODAY:mode==='done'?t.done:true;return scope&&(!filter||t.cat===filter)&&(!mon||t.date.startsWith(mon))&&t.name.toLowerCase().includes(q)}).sort((a,b)=>b.date.localeCompare(a.date)||a.done-b.done)}
 
 function taskBrandColor(t){
  const b=brands.find(x=>String(x.id)===String(t.brandId))||
@@ -682,7 +703,20 @@ function renderMonthMenu(){
  $('#monthMenu').innerHTML=`<div class="monthMenuHead"><button type="button" onclick="event.stopPropagation();changeMonthYear(-1)">‹</button><strong>${monthMenuYear}</strong><button type="button" onclick="event.stopPropagation();changeMonthYear(1)">›</button></div><div class="monthGrid">${months.map((m,i)=>{let v=monthMenuYear+'-'+String(i+1).padStart(2,'0');return `<button type="button" class="${monthFilter===v?'selected':''}" onclick="event.stopPropagation();pickMonth('${v}','${m} ${monthMenuYear}')">${m}</button>`}).join('')}</div><button class="monthAll" type="button" onclick="event.stopPropagation();pickMonth('','Tất cả tháng')">Tất cả tháng</button>`
 }
 function changeMonthYear(n){monthMenuYear+=n;renderMonthMenu()}
-function pickMonth(v,label){monthFilter=v;$('#monthFilterText').textContent=label;document.querySelector('.monthPicker').classList.remove('open');renderTasks()}
+function pickMonth(v,label){
+ monthFilter=v;
+ if(v) reportMonth=v;
+ $('#monthFilterText').textContent=label;
+ document.querySelector('.monthPicker').classList.remove('open');
+ if(v){
+   const [y,m]=v.split('-').map(Number);
+   const d=new Date(y,m-1,1);
+   const reportLabel=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(d);
+   $('#monthText').textContent=reportLabel;
+   $('#brandMonthText').textContent='Completed Edit Video by brand · '+reportLabel;
+ }
+ renderTasks()
+}
 const PLATFORM_OPTIONS=['FB/IG','Pinterest','YouTube','TikTok'];let selectedPlatforms=[];
 function renderPlatformChoices(){const block=$('#platformBlock'),box=$('#platformChoices');if(!block||!box)return;block.classList.toggle('show',selectedCat==='Đăng Bài');box.innerHTML=PLATFORM_OPTIONS.map(p=>`<button type="button" class="platformChoice ${selectedPlatforms.includes(p)?'active':''}" onclick="togglePlatform('${p}')">${selectedPlatforms.includes(p)?'✓ ':''}${p}</button>`).join('')}
 function togglePlatform(p){selectedPlatforms=selectedPlatforms.includes(p)?selectedPlatforms.filter(x=>x!==p):[...selectedPlatforms,p];renderPlatformChoices()}
@@ -710,8 +744,8 @@ async function deleteEditing(){
 }
 function toggleCalendar(e){e.stopPropagation();$('#calendarPopup').classList.toggle('open');renderCalendar()}function renderCalendar(){let y=calendarCursor.getFullYear(),m=calendarCursor.getMonth(),first=new Date(y,m,1),start=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),out='';$('#calMonth').textContent=new Intl.DateTimeFormat('vi-VN',{month:'long',year:'numeric'}).format(first);for(let i=start-1;i>=0;i--)out+=calBtn(new Date(y,m-1,prev-i),true);for(let d=1;d<=days;d++)out+=calBtn(new Date(y,m,d),false);let tail=(7-(start+days)%7)%7;for(let d=1;d<=tail;d++)out+=calBtn(new Date(y,m+1,d),true);$('#calDays').innerHTML=out}
 function calBtn(d,dim){let k=iso(d);return `<button type="button" class="${dim?'dim ':''}${k===selectedDate?'selected ':''}${k===TODAY?'today':''}" onclick="pickDate('${k}')">${d.getDate()}</button>`}function pickDate(k){selectedDate=k;calendarCursor=new Date(k+'T00:00:00');$('#dateDisplay').textContent=dateLabel(k);$('#calendarPopup').classList.remove('open');renderCalendar()}function changeMonth(n){calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+n,1);renderCalendar()}
-document.addEventListener('click',e=>{if(!e.target.closest('.filter')){$('#menu').classList.remove('open');document.querySelector('.filter').classList.remove('open')}if(!e.target.closest('.monthPicker'))document.querySelector('.monthPicker').classList.remove('open');if(!e.target.closest('.datePicker'))$('#calendarPopup').classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric'}).format(now);$('#monthText').textContent=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(now);document.addEventListener('click',e=>{
+document.addEventListener('click',e=>{if(!e.target.closest('.filter')){$('#menu').classList.remove('open');document.querySelector('.filter').classList.remove('open')}if(!e.target.closest('.monthPicker'))document.querySelectorAll('.monthPicker').forEach(x=>x.classList.remove('open'));if(!e.target.closest('.datePicker'))$('#calendarPopup').classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric'}).format(now);$('#monthText').textContent=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(now);const initialReportLabel=new Intl.DateTimeFormat('vi-VN',{month:'long',year:'numeric'}).format(now);const pmft=$('#postingMonthFilterText');if(pmft)pmft.textContent=initialReportLabel;document.addEventListener('click',e=>{
  const picker=document.querySelector('.brandPicker');
  const menu=document.querySelector('#brandMenu');
  if(picker&&menu&&!picker.contains(e.target))menu.classList.remove('show');
