@@ -1,0 +1,13 @@
+{
+  "name": "phong-work-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "desktop:prepare": "node scripts/prepare-desktop.mjs",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  }
+}
