@@ -106,3 +106,17 @@ body{background:#F7F8F7!important;background-image:none!important}
 #pwReminderToast{border-radius:10px!important}
 @media(max-width:720px){.controls{grid-template-columns:minmax(0,1fr) minmax(110px,max-content) minmax(90px,max-content)!important;gap:7px!important}}
 @media(max-width:520px){.controls{grid-template-columns:1fr 1fr!important}.controls .search{grid-column:1/-1!important}.controls .monthPicker,.controls .filter{min-width:0!important}.controls .monthBtn,.controls .filterBtn{width:100%!important}.tabs{width:100%!important}.tabs .tab{flex:1!important;padding:8px 5px!important;font-size:11px!important}.app>.summary{grid-template-columns:1fr!important}}
+
+/* v4: task row rhythm and compact section headers */
+.tasksViewport{border-radius:12px!important;padding-right:4px!important}
+.groupHead{position:sticky!important;top:0!important;z-index:3!important;display:flex!important;align-items:center!important;justify-content:space-between!important;margin:12px 0 6px!important;padding:10px 12px!important;min-height:39px!important;background:#F4F6F3!important;border:1px solid #E5EBE5!important;border-radius:9px!important;box-shadow:none!important;backdrop-filter:none!important}
+.groupHead strong{font-size:12px!important;font-weight:750!important;color:#3E5548!important}
+.groupHead span{font-size:11px!important;color:#7C8B80!important;white-space:nowrap!important}
+.task{min-height:64px!important;display:flex!important;align-items:center!important;gap:12px!important;padding:13px 14px!important}
+.taskTitle{font-size:13px!important;line-height:1.45!important;font-weight:700!important;color:#26372E!important;overflow-wrap:anywhere!important}
+.taskNote{font-size:11px!important;line-height:1.5!important;color:#87928A!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;line-clamp:2!important;overflow:hidden!important;overflow-wrap:anywhere!important;max-width:100%!important}
+.taskMetaLine{margin-top:7px!important;gap:7px!important}
+.taskBrand{color:#6C7770!important;font-size:10.5px!important}
+.task.done .taskTitle{color:#78837B!important}
+.task.done .taskNote{color:#99A39B!important}
+@media(max-width:520px){.groupHead{padding:9px 10px!important}.task{padding:12px 10px!important;gap:10px!important}.taskTitle{font-size:12.5px!important}.taskNote{font-size:10.5px!important}}
