@@ -1,0 +1,33 @@
+/* PHONG WORK / refined dashboard, visual-only preview. No data mutations. */
+:root{--pw-paper:#f5f7f7;--pw-ink:#1c2730;--pw-green:#216b5a;--pw-blue:#3d769e;--pw-line:#e6eceb}
+body{background:linear-gradient(155deg,#edf4f1 0%,#f7f8f8 48%,#eaf0f3 100%) fixed!important;color:var(--pw-ink)!important;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif!important}
+.app{max-width:1190px!important;margin:0 auto!important;padding:25px 22px 45px!important;display:grid!important;grid-template-columns:minmax(0,1.48fr) minmax(315px,1fr)!important;gap:20px!important;align-items:start!important}
+.app>.top{grid-column:1/-1!important;display:flex!important;align-items:center!important;padding:15px 20px!important;background:#fff!important;border:1px solid #e4ebe8!important;border-radius:20px!important;box-shadow:0 8px 25px rgba(23,44,48,.045)!important;min-height:72px!important}
+.top .logo{font-size:18px!important;letter-spacing:.015em!important;font-weight:850!important;color:#204f45!important}
+.top .autosave{margin-left:auto!important;background:#eff8f2!important;color:#3b7359!important;border-radius:99px!important;padding:8px 11px!important;font-size:11px!important}
+.app>.summary{grid-column:1/-1!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:20px!important;align-items:center!important;background:linear-gradient(112deg,#174e47 0%,#246f60 64%,#3b8b74 100%)!important;color:#fff!important;border:0!important;border-radius:25px!important;padding:26px 30px!important;box-shadow:0 18px 35px #164d3e22!important}
+.summary .label,.summary .small,.summary .progressLine,.summary .progressLine span,.summary .dateBig{color:#fff!important}
+.summary .label{text-transform:uppercase!important;letter-spacing:.18em!important;opacity:.65!important;font-weight:750!important}
+.summary .dateBig{font-size:clamp(23px,3vw,37px)!important;line-height:1.18!important;margin-top:8px!important;font-weight:800!important}
+.summary .progressLine{font-size:13px!important}.summary .progressLine strong{font-size:24px!important;color:#e1f7a4!important}
+.summary .track{background:#ffffff38!important;height:12px!important;border-radius:99px!important}.summary .fill{background:linear-gradient(90deg,#dcf6b6,#8ee0c3)!important;border-radius:99px!important}
+.app>.card:not(.summary){margin:0!important;background:#fff!important;border:1px solid #e7ebea!important;border-radius:24px!important;box-shadow:0 12px 32px rgba(20,38,37,.047)!important;padding:23px!important;min-width:0!important}
+.app>.tasksCard{grid-column:1!important;grid-row:3/span 3!important}
+.app>.monthCard{grid-column:2!important}
+.app>.card h2{font-size:17px!important;letter-spacing:-.35px!important;color:#263a35!important;font-weight:800!important}
+.app .small{color:#86928f!important;font-size:11px!important;line-height:1.5!important}
+.tasksHead{gap:15px!important;align-items:center!important;margin-bottom:18px!important}
+.tasksHeadActions{display:flex!important;gap:7px!important;flex-wrap:wrap!important}
+.add{background:#246b5b!important;color:white!important;border-radius:11px!important;font-weight:700!important;box-shadow:none!important;padding:10px 13px!important}.add.secondary{background:#eef6f1!important;color:#266d5d!important;border:1px solid #dcece2!important}
+.tabs{display:flex!important;gap:5px!important;border-radius:12px!important;background:#f4f7f6!important;padding:5px!important;overflow-x:auto!important;scrollbar-width:none!important}.tab{border-radius:9px!important;white-space:nowrap!important;color:#7c8b86!important;padding:9px 12px!important}.tab.active{color:#fff!important;background:#286e5e!important;box-shadow:0 3px 10px #20574b22!important}
+.controls{display:flex!important;flex-wrap:wrap!important;gap:9px!important;margin-top:18px!important;margin-bottom:13px!important}.search,.monthBtn,.filterBtn{background:#fafcfa!important;border:1px solid #e4eae5!important;border-radius:11px!important;color:#52645d!important;min-height:37px!important}.search:focus{border-color:#6eac99!important;outline:2px solid #a1d2c44d!important}
+.tasksViewport{max-height:675px!important;scrollbar-width:thin!important}.groupHead{border-bottom:1px solid #ecf1ee!important;padding-bottom:9px!important;margin-top:18px!important}.groupHead strong{color:#3e6559!important}
+.task{border:1px solid #e9edeb!important;border-radius:13px!important;background:#fff!important;box-shadow:0 3px 10px #173f2b05!important;margin:8px 0!important;padding:12px 13px!important;transition:background .15s,border-color .15s,transform .15s!important}.task:hover{background:#f8fbf9!important;border-color:#a9cbbb!important;transform:translateY(-1px)!important}.task.done{background:#f6faf7!important;opacity:.77!important}
+.monthCard .head,.brandHead{gap:12px!important;flex-wrap:wrap!important}.monthCard .total strong{color:#246b5b!important;font-size:29px!important}
+.monthCard .chartWrap{height:245px!important}.outputBarsHost{width:100%!important;max-width:100%!important}
+.overlay,.bulkOverlay,.brandManager{backdrop-filter:blur(5px)!important}
+.modal,.bulkModal,.brandPanel{background:#fff!important;border-radius:22px!important;border:1px solid #e7ece9!important;box-shadow:0 25px 70px #183f3435!important}
+.saveBtn,.bulkAdd{background:#246b5b!important;border-radius:11px!important}.cancel,.bulkBack{border-radius:11px!important}
+#pwReminderPanel{background:#fff!important;border:1px solid #e4eae7!important;box-shadow:0 25px 65px #102d2b21!important;border-radius:20px!important}#pwReminderPanel .pw-notice{border-left-color:#78baa1!important}
+@media(max-width:880px){.app{grid-template-columns:1fr!important;gap:14px!important;padding:12px!important}.app>.top,.app>.summary,.app>.tasksCard,.app>.monthCard{grid-column:1!important;grid-row:auto!important}.app>.summary{grid-template-columns:1fr!important}.app>.card:not(.summary){padding:18px!important}.tasksHead{align-items:flex-start!important;flex-direction:column!important}.tasksHeadActions{width:100%!important}.tasksHeadActions .add{flex:1!important}.top .autosave{font-size:10px!important}}
+@media(max-width:460px){.app>.top{padding:12px!important}.summary{padding:21px!important}.tabs .tab{font-size:11px!important;padding:8px 10px!important}.controls .search{width:100%!important}.app>.card h2{font-size:16px!important}#pwReminderPanel{right:10px!important;top:65px!important;width:calc(100vw - 20px)!important;max-height:74vh!important}}
