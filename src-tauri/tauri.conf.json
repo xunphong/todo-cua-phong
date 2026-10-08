@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "PHONG WORK",
+  "version": "0.1.0",
+  "identifier": "com.phongwork.desktop",
+  "build": {
+    "frontendDist": "../desktop-dist",
+    "beforeBuildCommand": "npm run desktop:prepare"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "PHONG WORK",
+        "width": 1150,
+        "height": 820,
+        "minWidth": 380,
+        "minHeight": 520,
+        "backgroundColor": "#7FA4D0"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ]
+  }
+}
