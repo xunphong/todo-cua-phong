@@ -7,7 +7,7 @@ const root=document.createElement('section');root.id='pwFocus';root.className='p
 <div class="pw-focus-head"><div><span class="pw-focus-kicker">FOCUS MODE</span><h2>Chỉ một việc trước mắt 🎬</h2></div><button id="pwFocusCollapse" class="pw-focus-min">Thu gọn</button></div>
 <div id="pwFocusContent">
 <label class="pw-focus-label" for="pwFocusSaved">Chọn từ task chưa hoàn thành</label>
-<select id="pwFocusSaved"><option value="">Đang tải công việc…</option></select>
+<div class="pw-focus-task-list" id="pwFocusSaved"><div class="pw-focus-loading">Đang tải công việc…</div></div>
 <label class="pw-focus-label" for="pwFocusTask">Hoặc nhập việc khác</label>
 <input id="pwFocusTask" maxlength="180" placeholder="Ví dụ: Dựng video du lịch 60 phút">
 <label class="pw-focus-label" for="pwFocusStep">Bước tiếp theo / điểm dừng</label>
@@ -51,13 +51,48 @@ const style=document.createElement('style');style.textContent=`
 .pw-immersive-buttons button{font-size:13px;padding:13px 19px}
 .pw-immersive-step{font-size:13px;max-width:580px;margin:auto;line-height:1.6;color:#f5f8f6}
 .pw-immersive-bottom{text-align:center;font-size:12px;opacity:.84}
+.pw-focus-task-list{max-height:340px;overflow:auto;border:1px solid #e1e6ea;border-radius:12px;background:#fbfbfa;margin-bottom:12px;scrollbar-width:thin}.pw-focus-loading{padding:18px 14px;font-size:12px;color:#7c8794}.pw-focus-day-head{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 13px;background:#f3f3ef;border-bottom:1px solid #e5e5e0;z-index:1}.pw-focus-day-head strong{font-size:12px;color:#33363b}.pw-focus-day-head small{font-size:10px;color:#90939b}.pw-focus-task-choice{display:flex;align-items:center;text-align:left;width:100%;gap:12px;padding:13px 14px;background:transparent;border:0;border-bottom:1px solid #ecece9;cursor:pointer;color:#17181b}.pw-focus-task-choice:hover{background:#eff4fc}.pw-focus-task-choice.selected{background:#eaf1fd}.pw-focus-choice-circle{display:grid;place-items:center;width:23px;height:23px;flex:0 0 23px;border-radius:50%;border:2px solid #c7c9ca;color:#fff;font-size:12px;font-weight:800}.pw-focus-task-choice.selected .pw-focus-choice-circle{background:#5b8def;border-color:#5b8def}.pw-focus-choice-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.pw-focus-choice-main b{font-size:12px;line-height:1.4;overflow-wrap:anywhere}.pw-focus-choice-main small{color:#898c91;font-size:10px}.pw-focus-choice-indicator{font-size:10px;color:#5b8def;font-weight:750}@media(max-width:600px){.pw-focus-task-list{max-height:300px}.pw-focus-task-choice{padding:12px 9px}.pw-focus-choice-indicator{font-size:9px}}
 @media(max-width:600px){.pw-immersive-inner{padding:21px 15px}.pw-immersive-header{font-size:10px}.pw-immersive-clock{font-size:clamp(76px,18vw,110px)}.pw-immersive-buttons{gap:8px}.pw-immersive-buttons button{padding:11px;font-size:12px}}
 `;document.head.appendChild(style);
 const tasksCard=document.querySelector('.tasksCard');if(tasksCard)tasksCard.parentNode.insertBefore(root,tasksCard);else document.querySelector('.app')?.appendChild(root);
 const saved=root.querySelector('#pwFocusSaved');
 function availableTasks(){try{return typeof tasks!=='undefined'&&Array.isArray(tasks)?tasks.filter(t=>!t.done):[]}catch{return []}}
-function refreshChoices(){const entries=availableTasks();const old=saved.value;saved.replaceChildren(new Option(entries.length?'Chọn một task chưa hoàn thành…':'Chưa có task để chọn', ''));entries.forEach(t=>saved.add(new Option((t.brand?t.brand+' · ':'')+t.name+' ('+t.date+')',String(t.id))));if(entries.some(t=>String(t.id)===old))saved.value=old;else if(state.taskId&&entries.some(t=>String(t.id)===String(state.taskId)))saved.value=String(state.taskId)}
-saved.addEventListener('change',()=>{const t=availableTasks().find(x=>String(x.id)===saved.value);if(!t)return;state.taskId=t.id;state.title=t.name;state.nextStep=state.nextStep||'';save();draw()});
+const fmtDate=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'')?d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4):(d||'Chưa có ngày');
+let lastSignature='';
+function refreshChoices(){
+ const entries=availableTasks().sort((a,b)=>(a.date||'').localeCompare(b.date||'')||String(a.name).localeCompare(String(b.name)));
+ const sig=entries.map(t=>[t.id,t.date,t.name,t.brand,t.done].join('|')).join('~')+'#'+String(state.taskId||'');
+ if(sig===lastSignature)return;lastSignature=sig;
+ saved.replaceChildren();
+ if(!entries.length){const empty=document.createElement('div');empty.className='pw-focus-loading';empty.textContent='Chưa tìm thấy task chưa hoàn thành. Đợi đồng bộ rồi thử lại.';saved.appendChild(empty);return}
+ const grouped=new Map();
+ entries.forEach(t=>{const key=t.date||'';if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(t)});
+ for(const [day,items] of grouped){
+  const group=document.createElement('div');group.className='pw-focus-day';
+  const head=document.createElement('div');head.className='pw-focus-day-head';
+  const label=document.createElement('strong');label.textContent=fmtDate(day);
+  const count=document.createElement('small');count.textContent=items.length+' việc chưa xong';
+  head.append(label,count);group.appendChild(head);
+  items.forEach(t=>{
+   const button=document.createElement('button');button.type='button';button.className='pw-focus-task-choice'+(String(state.taskId)===String(t.id)?' selected':'');
+   const circle=document.createElement('span');circle.className='pw-focus-choice-circle';circle.textContent=String(state.taskId)===String(t.id)?'✓':'';
+   const middle=document.createElement('span');middle.className='pw-focus-choice-main';
+   const name=document.createElement('b');name.textContent=t.name;
+   const meta=document.createElement('small');meta.textContent=[t.brand||'Không có brand',t.cat||''].filter(Boolean).join(' · ');
+   middle.append(name,meta);
+   const check=document.createElement('span');check.className='pw-focus-choice-indicator';check.textContent=String(state.taskId)===String(t.id)?'Đang chọn':'Chọn';
+   button.append(circle,middle,check);
+   button.addEventListener('click',()=>{
+    if(state.active){status.textContent='Hãy kết thúc phiên đang chạy trước khi đổi task.';return}
+    state.taskId=t.id;state.title=t.name;state.nextStep='';save();lastSignature='';refreshChoices();draw();
+   });
+   group.appendChild(button);
+  });saved.appendChild(group);
+ }
+}
+window.pwRefreshFocusTasks=refreshChoices;
+refreshChoices();
+const choicesInterval=setInterval(refreshChoices,2000);
 const closeImmersive=()=>{immersive.hidden=true;document.body.style.overflow=''};
 root.querySelector('#pwFocusImmersive').addEventListener('click',()=>{refreshChoices();immersive.hidden=false;document.body.style.overflow='hidden';updateImmersive()});
 immersive.querySelector('#pwImmersiveClose').addEventListener('click',closeImmersive);
@@ -65,7 +100,7 @@ immersive.querySelector('#pwImmersivePause').addEventListener('click',()=>root.q
 immersive.querySelector('#pwImmersiveFinish').addEventListener('click',()=>{root.querySelector('#pwFocusEnd').click();closeImmersive();root.scrollIntoView({behavior:'smooth',block:'center'})});
 immersive.querySelector('#pwImmersivePlus').addEventListener('click',()=>{if(!state.active)return;state.duration+=5;save();draw()});
 function updateImmersive(){immersive.querySelector('#pwImmersiveClock').textContent=clock.textContent;immersive.querySelector('#pwImmersiveTask').textContent=state.title||'Chọn một việc để bắt đầu';immersive.querySelector('#pwImmersiveStep').textContent=state.nextStep||'';immersive.querySelector('#pwImmersivePause').textContent=state.pausedAt?'▶ Tiếp tục':'⏸ Tạm dừng'}
-refreshChoices();setInterval(()=>{if(!immersive.hidden)refreshChoices()},30000);
+
 const $=id=>root.querySelector('#'+id),title=$('pwFocusTask'),step=$('pwFocusStep'),clock=$('pwFocusClock'),status=$('pwFocusStatus'),review=$('pwFocusReview');
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function elapsed(){return Math.max(0,(state.pausedAt||Date.now())-state.start-state.pausedTotal)}
@@ -79,7 +114,7 @@ status.textContent=state.finished?'Phiên đã kết thúc. Bạn có thể lưu
 $('pwFocusStart').hidden=state.active||state.finished;
 $('pwFocusPause').hidden=!state.active;$('pwFocusPause').textContent=state.pausedAt?'Tiếp tục':'Tạm dừng';$('pwFocusEnd').hidden=!state.active;review.hidden=!state.finished;updateImmersive();
 }
-title.addEventListener('input',()=>{state.title=title.value;state.taskId=null;saved.value='';save()});step.addEventListener('input',()=>{state.nextStep=step.value;save()});
+title.addEventListener('input',()=>{state.title=title.value;state.taskId=null;save();refreshChoices()});step.addEventListener('input',()=>{state.nextStep=step.value;save()});
 root.querySelectorAll('[data-min]').forEach(b=>b.addEventListener('click',()=>{if(state.active)return;state.duration=+b.dataset.min;state.finished=false;save();draw()}));
 $('pwFocusStart').addEventListener('click',async()=>{if(!title.value.trim()){title.focus();return}state={...state,title:title.value.trim(),nextStep:step.value,duration:state.duration,start:Date.now(),pausedAt:0,pausedTotal:0,active:true,finished:false,reminded:false};save();draw();if('Notification'in window&&Notification.permission==='default')try{await Notification.requestPermission()}catch{}});
 $('pwFocusPause').addEventListener('click',()=>{if(!state.active)return;if(state.pausedAt){state.pausedTotal+=Date.now()-state.pausedAt;state.pausedAt=0}else state.pausedAt=Date.now();save();draw()});
