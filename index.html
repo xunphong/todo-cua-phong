@@ -2478,7 +2478,7 @@ let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{w
  const menu=document.querySelector('#brandMenu');
  if(picker&&menu&&!picker.contains(e.target))menu.classList.remove('show');
 });
-window.pwStartAfterUnlock=()=>{loadTasks();if(!document.getElementById('pwRemindersScript')){const script=document.createElement('script');script.id='pwRemindersScript';script.src='reminders.js?v=4';document.body.appendChild(script)}if(!document.getElementById('pwFocusScript')){const focus=document.createElement('script');focus.id='pwFocusScript';focus.src='focus.js?v=5';document.body.appendChild(focus)}};
+window.pwStartAfterUnlock=()=>{loadTasks();if(!document.getElementById('pwRemindersScript')){const script=document.createElement('script');script.id='pwRemindersScript';script.src='reminders.js?v=4';document.body.appendChild(script)}if(!document.getElementById('pwFocusScript')){const focus=document.createElement('script');focus.id='pwFocusScript';focus.src='focus.js?v=6';document.body.appendChild(focus)}};
 </script><script id="pwPinPreviewLogic">(function(){
  const form=document.getElementById('pwPinForm'),input=document.getElementById('pwPinInput'),msg=document.getElementById('pwPinMessage'),btn=document.getElementById('pwPinSubmit'),layer=document.getElementById('pwPinLayer');
  const dots=[...document.querySelectorAll('.pw-pin-dot')];const renderDots=()=>dots.forEach((dot,i)=>dot.classList.toggle('filled',i<input.value.length));input.addEventListener('input',renderDots);document.querySelectorAll('[data-pin-key]').forEach(el=>el.addEventListener('click',()=>{const k=el.dataset.pinKey;input.value=k==='back'?input.value.slice(0,-1):(input.value+k).replace(/\D/g,'').slice(0,6);renderDots()}));
