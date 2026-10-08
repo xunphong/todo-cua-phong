@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PHONG WORK · Quay lại Focus</title><style>
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;color:white;background:linear-gradient(145deg,#537ba5,#89aacc 45%,#b7cbe2);font-family:"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
+main{text-align:center;width:min(760px,100%)}.eyebrow{letter-spacing:.18em;font-weight:750;font-size:13px}.time{font-size:clamp(74px,15vw,160px);font-weight:800;letter-spacing:-.07em;margin:15px 0 0;font-variant-numeric:tabular-nums}.task{font-size:clamp(20px,3vw,32px);font-weight:700;margin-bottom:14px}.message{font-size:17px;line-height:1.5;opacity:.93}.buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}button{font-size:16px;font-weight:700;padding:18px 24px;border-radius:14px;cursor:pointer;border:1px solid rgba(255,255,255,.4);background:#fff;color:#365a80}button.secondary{background:rgba(30,61,89,.23);color:#fff}small{display:block;opacity:.7;margin-top:34px}
+</style></head><body><main><div class="eyebrow">✦ PHONG WORK / QUAY LẠI FOCUS</div><div class="time" id="time">!</div><div class="task" id="task">Đến lúc quay lại công việc 🎬</div><div class="message">Bạn đang trong phiên tập trung. Mình tiếp tục nhé?</div><div class="buttons"><button id="back">▶ Quay lại Focus</button><button id="later" class="secondary">Hoãn 5 phút</button><button id="dismiss" class="secondary">Bỏ qua</button></div><small>Nhấn Esc để đóng · Bạn luôn có thể tắt nhắc nhở</small></main><script>
+const api=window.__TAURI__?.core?.invoke;
+async function hydrate(){try{const v=await api('focus_summary');document.getElementById('task').textContent=v.title||'Quay lại công việc nào 🎬';document.getElementById('time').textContent=v.completed?'HẾT GIỜ':'NHẮC NHỞ'}catch{}}
+document.getElementById('back').onclick=()=>api('return_to_focus');
+document.getElementById('later').onclick=()=>api('snooze_focus');
+document.getElementById('dismiss').onclick=()=>api('dismiss_focus');
+document.addEventListener('keydown',e=>{if(e.key==='Escape')api('dismiss_focus')});
+hydrate();
+</script></body></html>
