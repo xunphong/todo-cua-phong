@@ -1816,9 +1816,32 @@ body:before{
 .pw-pin-layer{position:fixed;inset:0;z-index:999999;display:grid;place-items:center;padding:24px;background:linear-gradient(145deg,#7fa4d0 0 48%,#b7cbe2 48% 76%,#d7e2ef 76%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 .pw-pin-layer[hidden]{display:none!important}.pw-pin-box{width:min(100%,385px);padding:30px;background:#fbfbfa;border:1px solid rgba(255,255,255,.8);border-radius:20px;box-shadow:0 24px 70px rgba(41,61,87,.18);text-align:center;color:#17181b}.pw-pin-badge{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 15px;background:#eaf0fb;border-radius:17px;color:#5b8def;font-size:24px}.pw-pin-box h1{font-size:23px;margin:0 0 7px;font-weight:800;letter-spacing:-.8px}.pw-pin-box p{font-size:12px;color:#8b8e95;margin:0 0 22px}.pw-pin-form{display:flex;gap:10px;flex-direction:column}.pw-pin-form input{height:48px;border-radius:12px;border:1px solid #d9dfeb;background:#fff;padding:0 14px;text-align:center;font-size:20px;letter-spacing:9px;outline:none;color:#17181b;width:100%}.pw-pin-form input:focus{border-color:#5b8def;box-shadow:0 0 0 3px rgba(91,141,239,.15)}.pw-pin-form button,.pw-pin-num{border:0;cursor:pointer}.pw-pin-form button{background:#17181b;color:#fff;border-radius:12px;padding:14px;font-weight:750;font-size:13px}.pw-pin-form button:disabled{opacity:.55;cursor:not-allowed}.pw-pin-pad{display:none;grid-template-columns:repeat(3,1fr);gap:9px;max-width:250px;margin:0 auto 18px}.pw-pin-num{height:56px;border-radius:12px;background:#f0f2f7;color:#17181b;font-weight:700;font-size:20px}.pw-pin-num:active{background:#dde7fb}.pw-pin-message{font-size:11px!important;color:#757d89!important;line-height:1.5!important;margin:14px 0 0!important}
 @media(max-width:650px){.pw-pin-pad{display:grid}.pw-pin-box{padding:24px 20px}.pw-pin-form input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}.pw-pin-form button{margin-top:0}.pw-pin-box p{margin-bottom:15px}}
+</style><style id="pwPinMobileRefine">
+/* PIN follows the original PHONG WORK blue/white design, compact on phones. */
+.pw-pin-layer{padding:16px!important;background:linear-gradient(145deg,#7fa4d0 0 48%,#b7cbe2 48% 76%,#d7e2ef 76%)!important}
+.pw-pin-box{box-shadow:0 18px 50px rgba(41,61,87,.13)!important}
+.pw-pin-form button[type=submit]{background:#5b8def!important;border-radius:12px!important}
+.pw-pin-badge{background:#e8effb!important;color:#5b8def!important}
+.pw-pin-dots{display:none;justify-content:center;gap:10px;margin:0 auto 15px}
+.pw-pin-dot{width:11px;height:11px;border-radius:50%;border:1.5px solid #a9b8d0;background:#f5f7fc;transition:background .12s}
+.pw-pin-dot.filled{background:#5b8def;border-color:#5b8def}
+@media(max-width:650px){
+ .pw-pin-layer{align-items:center!important;padding:12px!important}
+ .pw-pin-box{width:min(100%,350px)!important;padding:22px 19px 20px!important;border-radius:18px!important}
+ .pw-pin-badge{height:42px!important;width:42px!important;font-size:21px!important;border-radius:12px!important;margin-bottom:10px!important}
+ .pw-pin-box h1{font-size:19px!important;margin-bottom:4px!important}
+ .pw-pin-box>p{font-size:11px!important;margin-bottom:14px!important}
+ .pw-pin-dots{display:flex!important}
+ .pw-pin-pad{grid-template-columns:repeat(3,1fr)!important;gap:8px!important;max-width:206px!important;margin:0 auto 15px!important}
+ .pw-pin-num{height:49px!important;min-height:0!important;border-radius:11px!important;background:#edf2fa!important;border:1px solid #dce5f2!important;color:#233b5b!important;font-size:17px!important;box-shadow:none!important;padding:0!important}
+ .pw-pin-num:active{background:#cbdcf9!important}
+ .pw-pin-form button[type=submit]{font-size:12px!important;padding:11px 12px!important}
+ .pw-pin-message{font-size:10px!important;margin-top:12px!important}
+}
+@media(max-height:680px) and (max-width:650px){.pw-pin-box{padding:15px!important}.pw-pin-badge{display:none!important}.pw-pin-pad{gap:5px!important;margin-bottom:9px!important}.pw-pin-num{height:42px!important}.pw-pin-box>p{margin-bottom:8px!important}}
 </style></head>
 <body>
-<div id="pwPinLayer" class="pw-pin-layer" role="dialog" aria-modal="true" aria-labelledby="pwPinHeading"><div class="pw-pin-box"><div class="pw-pin-badge" aria-hidden="true">🔒</div><h1 id="pwPinHeading">PHONG WORK</h1><p>Không gian làm việc riêng tư của bạn</p><form id="pwPinForm" class="pw-pin-form" autocomplete="off"><input id="pwPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" minlength="6" placeholder="••••••" aria-label="Mã PIN gồm sáu chữ số" autocomplete="off"><div class="pw-pin-pad" id="pwPinPad"><button type="button" class="pw-pin-num" data-pin-key="1">1</button><button type="button" class="pw-pin-num" data-pin-key="2">2</button><button type="button" class="pw-pin-num" data-pin-key="3">3</button><button type="button" class="pw-pin-num" data-pin-key="4">4</button><button type="button" class="pw-pin-num" data-pin-key="5">5</button><button type="button" class="pw-pin-num" data-pin-key="6">6</button><button type="button" class="pw-pin-num" data-pin-key="7">7</button><button type="button" class="pw-pin-num" data-pin-key="8">8</button><button type="button" class="pw-pin-num" data-pin-key="9">9</button><span></span><button type="button" class="pw-pin-num" data-pin-key="0">0</button><button type="button" class="pw-pin-num" data-pin-key="back" aria-label="Xóa một số">⌫</button></div><button id="pwPinSubmit" type="submit">Mở khóa →</button></form><p class="pw-pin-message" id="pwPinMessage" role="status">Đang kiểm tra quyền truy cập an toàn…</p></div></div><div class="app">
+<div id="pwPinLayer" class="pw-pin-layer" role="dialog" aria-modal="true" aria-labelledby="pwPinHeading"><div class="pw-pin-box"><div class="pw-pin-badge" aria-hidden="true">🔒</div><h1 id="pwPinHeading">PHONG WORK</h1><p>Không gian làm việc riêng tư của bạn</p><form id="pwPinForm" class="pw-pin-form" autocomplete="off"><input id="pwPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" minlength="6" placeholder="••••••" aria-label="Mã PIN gồm sáu chữ số" autocomplete="off"><div class="pw-pin-dots" id="pwPinDots" aria-label="Số chữ số đã nhập"><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span></div><div class="pw-pin-pad" id="pwPinPad"><button type="button" class="pw-pin-num" data-pin-key="1">1</button><button type="button" class="pw-pin-num" data-pin-key="2">2</button><button type="button" class="pw-pin-num" data-pin-key="3">3</button><button type="button" class="pw-pin-num" data-pin-key="4">4</button><button type="button" class="pw-pin-num" data-pin-key="5">5</button><button type="button" class="pw-pin-num" data-pin-key="6">6</button><button type="button" class="pw-pin-num" data-pin-key="7">7</button><button type="button" class="pw-pin-num" data-pin-key="8">8</button><button type="button" class="pw-pin-num" data-pin-key="9">9</button><span></span><button type="button" class="pw-pin-num" data-pin-key="0">0</button><button type="button" class="pw-pin-num" data-pin-key="back" aria-label="Xóa một số">⌫</button></div><button id="pwPinSubmit" type="submit">Mở khóa →</button></form><p class="pw-pin-message" id="pwPinMessage" role="status">Đang kiểm tra quyền truy cập an toàn…</p></div></div><div class="app">
  <div class="top"><div class="logo">PHONG WORK</div><div class="autosave" id="saveState">● Auto saved</div></div>
  <section class="card summary"><div><div class="label">TODAY</div><div class="dateBig" id="dateText"></div><div class="small" id="todayText"></div></div><div><div class="progressLine"><span>Daily progress</span><strong id="todayPct">0%</strong></div><div class="track"><div class="fill" id="todayFill"></div></div></div></section>
 
@@ -2425,7 +2448,7 @@ let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{w
 window.pwStartAfterUnlock=()=>loadTasks();
 </script><script id="pwPinPreviewLogic">(function(){
  const form=document.getElementById('pwPinForm'),input=document.getElementById('pwPinInput'),msg=document.getElementById('pwPinMessage'),btn=document.getElementById('pwPinSubmit'),layer=document.getElementById('pwPinLayer');
- document.querySelectorAll('[data-pin-key]').forEach(el=>el.addEventListener('click',()=>{const k=el.dataset.pinKey;input.value=k==='back'?input.value.slice(0,-1):(input.value+k).replace(/\D/g,'').slice(0,6)}));
+ const dots=[...document.querySelectorAll('.pw-pin-dot')];const renderDots=()=>dots.forEach((dot,i)=>dot.classList.toggle('filled',i<input.value.length));input.addEventListener('input',renderDots);document.querySelectorAll('[data-pin-key]').forEach(el=>el.addEventListener('click',()=>{const k=el.dataset.pinKey;input.value=k==='back'?input.value.slice(0,-1):(input.value+k).replace(/\D/g,'').slice(0,6);renderDots()}));
  async function getSession(){
   let {data:{session},error}=await db.auth.getSession();
   if(error)throw error;
@@ -2441,7 +2464,7 @@ window.pwStartAfterUnlock=()=>loadTasks();
  }
  (async()=>{try{if(await unlockWithExistingSession())return;msg.textContent='Nhập mã PIN 6 số để mở khóa dữ liệu riêng tư.'}catch(e){msg.textContent='Không thể kiểm tra phiên đăng nhập. Vui lòng kết nối mạng và thử lại.'}})();
  form.addEventListener('submit',async e=>{
-  e.preventDefault();const pin=input.value;input.value='';
+  e.preventDefault();const pin=input.value;input.value='';renderDots();
   if(!/^\d{6}$/.test(pin)){msg.textContent='PIN phải có đúng 6 chữ số.';return}
   btn.disabled=true;msg.textContent='Đang xác minh an toàn…';
   try{
