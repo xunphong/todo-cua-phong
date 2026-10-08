@@ -1,33 +1,64 @@
-/* PHONG WORK / refined dashboard, visual-only preview. No data mutations. */
-:root{--pw-paper:#f5f7f7;--pw-ink:#1c2730;--pw-green:#216b5a;--pw-blue:#3d769e;--pw-line:#e6eceb}
-body{background:linear-gradient(155deg,#edf4f1 0%,#f7f8f8 48%,#eaf0f3 100%) fixed!important;color:var(--pw-ink)!important;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif!important}
-.app{max-width:1190px!important;margin:0 auto!important;padding:25px 22px 45px!important;display:grid!important;grid-template-columns:minmax(0,1.48fr) minmax(315px,1fr)!important;gap:20px!important;align-items:start!important}
-.app>.top{grid-column:1/-1!important;display:flex!important;align-items:center!important;padding:15px 20px!important;background:#fff!important;border:1px solid #e4ebe8!important;border-radius:20px!important;box-shadow:0 8px 25px rgba(23,44,48,.045)!important;min-height:72px!important}
-.top .logo{font-size:18px!important;letter-spacing:.015em!important;font-weight:850!important;color:#204f45!important}
-.top .autosave{margin-left:auto!important;background:#eff8f2!important;color:#3b7359!important;border-radius:99px!important;padding:8px 11px!important;font-size:11px!important}
-.app>.summary{grid-column:1/-1!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:20px!important;align-items:center!important;background:linear-gradient(112deg,#174e47 0%,#246f60 64%,#3b8b74 100%)!important;color:#fff!important;border:0!important;border-radius:25px!important;padding:26px 30px!important;box-shadow:0 18px 35px #164d3e22!important}
-.summary .label,.summary .small,.summary .progressLine,.summary .progressLine span,.summary .dateBig{color:#fff!important}
-.summary .label{text-transform:uppercase!important;letter-spacing:.18em!important;opacity:.65!important;font-weight:750!important}
-.summary .dateBig{font-size:clamp(23px,3vw,37px)!important;line-height:1.18!important;margin-top:8px!important;font-weight:800!important}
-.summary .progressLine{font-size:13px!important}.summary .progressLine strong{font-size:24px!important;color:#e1f7a4!important}
-.summary .track{background:#ffffff38!important;height:12px!important;border-radius:99px!important}.summary .fill{background:linear-gradient(90deg,#dcf6b6,#8ee0c3)!important;border-radius:99px!important}
-.app>.card:not(.summary){margin:0!important;background:#fff!important;border:1px solid #e7ebea!important;border-radius:24px!important;box-shadow:0 12px 32px rgba(20,38,37,.047)!important;padding:23px!important;min-width:0!important}
-.app>.tasksCard{grid-column:1!important;grid-row:3/span 3!important}
-.app>.monthCard{grid-column:2!important}
-.app>.card h2{font-size:17px!important;letter-spacing:-.35px!important;color:#263a35!important;font-weight:800!important}
-.app .small{color:#86928f!important;font-size:11px!important;line-height:1.5!important}
-.tasksHead{gap:15px!important;align-items:center!important;margin-bottom:18px!important}
-.tasksHeadActions{display:flex!important;gap:7px!important;flex-wrap:wrap!important}
-.add{background:#246b5b!important;color:white!important;border-radius:11px!important;font-weight:700!important;box-shadow:none!important;padding:10px 13px!important}.add.secondary{background:#eef6f1!important;color:#266d5d!important;border:1px solid #dcece2!important}
-.tabs{display:flex!important;gap:5px!important;border-radius:12px!important;background:#f4f7f6!important;padding:5px!important;overflow-x:auto!important;scrollbar-width:none!important}.tab{border-radius:9px!important;white-space:nowrap!important;color:#7c8b86!important;padding:9px 12px!important}.tab.active{color:#fff!important;background:#286e5e!important;box-shadow:0 3px 10px #20574b22!important}
-.controls{display:flex!important;flex-wrap:wrap!important;gap:9px!important;margin-top:18px!important;margin-bottom:13px!important}.search,.monthBtn,.filterBtn{background:#fafcfa!important;border:1px solid #e4eae5!important;border-radius:11px!important;color:#52645d!important;min-height:37px!important}.search:focus{border-color:#6eac99!important;outline:2px solid #a1d2c44d!important}
-.tasksViewport{max-height:675px!important;scrollbar-width:thin!important}.groupHead{border-bottom:1px solid #ecf1ee!important;padding-bottom:9px!important;margin-top:18px!important}.groupHead strong{color:#3e6559!important}
-.task{border:1px solid #e9edeb!important;border-radius:13px!important;background:#fff!important;box-shadow:0 3px 10px #173f2b05!important;margin:8px 0!important;padding:12px 13px!important;transition:background .15s,border-color .15s,transform .15s!important}.task:hover{background:#f8fbf9!important;border-color:#a9cbbb!important;transform:translateY(-1px)!important}.task.done{background:#f6faf7!important;opacity:.77!important}
-.monthCard .head,.brandHead{gap:12px!important;flex-wrap:wrap!important}.monthCard .total strong{color:#246b5b!important;font-size:29px!important}
-.monthCard .chartWrap{height:245px!important}.outputBarsHost{width:100%!important;max-width:100%!important}
-.overlay,.bulkOverlay,.brandManager{backdrop-filter:blur(5px)!important}
-.modal,.bulkModal,.brandPanel{background:#fff!important;border-radius:22px!important;border:1px solid #e7ece9!important;box-shadow:0 25px 70px #183f3435!important}
-.saveBtn,.bulkAdd{background:#246b5b!important;border-radius:11px!important}.cancel,.bulkBack{border-radius:11px!important}
-#pwReminderPanel{background:#fff!important;border:1px solid #e4eae7!important;box-shadow:0 25px 65px #102d2b21!important;border-radius:20px!important}#pwReminderPanel .pw-notice{border-left-color:#78baa1!important}
-@media(max-width:880px){.app{grid-template-columns:1fr!important;gap:14px!important;padding:12px!important}.app>.top,.app>.summary,.app>.tasksCard,.app>.monthCard{grid-column:1!important;grid-row:auto!important}.app>.summary{grid-template-columns:1fr!important}.app>.card:not(.summary){padding:18px!important}.tasksHead{align-items:flex-start!important;flex-direction:column!important}.tasksHeadActions{width:100%!important}.tasksHeadActions .add{flex:1!important}.top .autosave{font-size:10px!important}}
-@media(max-width:460px){.app>.top{padding:12px!important}.summary{padding:21px!important}.tabs .tab{font-size:11px!important;padding:8px 10px!important}.controls .search{width:100%!important}.app>.card h2{font-size:16px!important}#pwReminderPanel{right:10px!important;top:65px!important;width:calc(100vw - 20px)!important;max-height:74vh!important}}
+/* PHONG WORK — visual system matched to expense-tracker-phong-style.html.
+   Presentation only. No changes to task or Supabase logic. */
+:root{--paper:#F6F3EB;--paper-light:#FBFAF7;--lime:#DCE99D;--lemon:#E8F19F;--green:#98C96E;--coral:#EF7F7A;--ink:#342D23;--forest:#384C27;--muted:#766F63;--line:#D9D2C4;--shadow:3px 4px 0 rgba(52,45,35,.12)}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0!important;min-width:320px!important;background:var(--paper)!important;color:var(--ink)!important;font:14px/1.45 ui-rounded,"Avenir Next",system-ui,-apple-system,"Segoe UI",sans-serif!important;background-image:radial-gradient(rgba(52,45,35,.07) .65px,transparent .65px)!important;background-size:9px 9px!important}
+.app{max-width:1100px!important;margin:auto!important;padding:36px 20px 76px!important;display:block!important}
+.app>.top{display:flex!important;align-items:center!important;gap:14px!important;min-height:70px!important;margin-bottom:26px!important;padding:0 0 0 15px!important;border:0!important;border-left:5px solid var(--coral)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.top .logo{font-size:clamp(26px,4vw,37px)!important;letter-spacing:-.06em!important;line-height:1!important;color:var(--forest)!important;font-weight:850!important}
+.top .logo:before{content:"SỔ CÔNG VIỆC CÁ NHÂN";display:block!important;margin:0 0 8px!important;color:var(--forest)!important;font-size:11px!important;letter-spacing:.14em!important;font-weight:800!important}
+.top .autosave{margin-left:auto!important;background:var(--paper-light)!important;color:var(--muted)!important;border:1px solid var(--ink)!important;box-shadow:2px 3px 0 var(--ink)!important;border-radius:3px!important;padding:8px 11px!important;font-size:11px!important;white-space:nowrap!important}
+.app>.card,.app>.summary,.app>.card:not(.summary){display:block!important;margin:18px 0 0!important;min-width:0!important;background:var(--paper-light)!important;color:var(--ink)!important;border:1px solid var(--ink)!important;border-radius:2px!important;box-shadow:var(--shadow)!important;padding:19px 18px 17px!important;transform:none!important}
+.app>.summary{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin-bottom:18px!important;min-height:132px!important;background:var(--lemon)!important;transform:rotate(-.24deg)!important;position:relative!important;overflow:hidden!important}
+.app>.summary:after{content:"";position:absolute;top:0;right:0;width:38px;height:38px;background:linear-gradient(135deg,transparent 49%,rgba(52,45,35,.12) 50%,rgba(52,45,35,.12) 52%,var(--paper) 53%)}
+.summary .label{font-size:11px!important;letter-spacing:.12em!important;font-weight:800!important;color:var(--forest)!important}
+.summary .small,.summary .progressLine,.summary .progressLine span,.summary .progressLine strong,.summary .dateBig{color:var(--forest)!important}
+.summary .dateBig{font-size:clamp(22px,3vw,32px)!important;font-weight:850!important;letter-spacing:-.055em!important;line-height:1.1!important}
+.summary .progressLine{font-size:13px!important}.summary .progressLine strong{font-size:29px!important}
+.summary .track{height:12px!important;background:rgba(56,76,39,.17)!important;border:1px solid rgba(56,76,39,.25)!important;border-radius:3px!important}
+.summary .fill{background:var(--forest)!important;border-radius:2px!important}
+.app>.tasksCard{border-top:5px solid var(--green)!important}
+.app>.monthCard{border-top:5px solid var(--coral)!important}
+.app>.monthCard:nth-of-type(even){border-top-color:var(--green)!important}
+.app>.card h2,.app .brandHead h2{color:var(--forest)!important;font-size:18px!important;letter-spacing:-.035em!important;font-weight:800!important;margin:0!important}
+.app>.card h2:before{content:"✦";font-size:13px;margin-right:7px;color:var(--coral)}
+.app .small{font-size:12px!important;color:var(--muted)!important;line-height:1.5!important}
+.tasksHead{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;margin-bottom:14px!important}
+.tasksHeadActions{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+button,input,select,textarea{font-family:inherit!important}
+.app button:not(.tab),.modal button,.bulkModal button,.brandPanel button{border-radius:3px!important;transition:transform .15s,background .15s,box-shadow .15s!important}
+.add{background:var(--forest)!important;color:var(--paper-light)!important;border:1px solid var(--forest)!important;box-shadow:2px 3px 0 #202c16!important;font-weight:750!important;padding:10px 13px!important}
+.add:hover{background:#4b6635!important;transform:translate(-1px,-1px)!important}
+.add.secondary{background:var(--lime)!important;border:1px solid var(--ink)!important;color:var(--forest)!important;box-shadow:2px 3px 0 rgba(52,45,35,.2)!important}
+.tabs{display:flex!important;gap:5px!important;padding:6px!important;overflow-x:auto!important;scrollbar-width:thin!important;background:#E7EDCE!important;border:1px solid var(--ink)!important;border-radius:3px!important}
+.tabs .tab{background:transparent!important;border:1px solid transparent!important;box-shadow:none!important;border-radius:2px!important;color:var(--forest)!important;font-weight:750!important;white-space:nowrap!important;padding:9px 13px!important}
+.tabs .tab.active{background:var(--forest)!important;color:#fff!important;border-color:var(--forest)!important}
+.controls{display:flex!important;gap:9px!important;flex-wrap:wrap!important;margin-top:15px!important;margin-bottom:14px!important}
+.search,.monthBtn,.filterBtn{background:#fffdf8!important;border:1px solid var(--ink)!important;border-radius:3px!important;color:var(--ink)!important;min-height:37px!important}
+.search:focus{outline:3px solid rgba(152,201,110,.45)!important}
+.tasksViewport{max-height:610px!important;scrollbar-width:thin!important}
+.groupHead{border-bottom:1px dashed var(--line)!important;padding:11px 0 9px!important}.groupHead strong{color:var(--forest)!important}
+.task{border:1px solid var(--line)!important;border-left:4px solid var(--green)!important;border-radius:2px!important;background:#fffdf8!important;box-shadow:2px 2px 0 rgba(52,45,35,.06)!important;margin:8px 0!important;padding:12px 13px!important;transition:transform .15s,background .15s!important}
+.task:hover{transform:translate(-1px,-1px)!important;background:#F3F5E5!important}
+.task.done{border-left-color:var(--forest)!important;background:#EEF3D3!important;opacity:.78!important}
+.monthCard .head,.brandHead{gap:12px!important;flex-wrap:wrap!important}
+.monthCard .total strong{font-size:31px!important;color:var(--forest)!important}
+.app .monthBtn,.app .filterBtn{box-shadow:2px 2px 0 rgba(52,45,35,.12)!important}
+.app .chartWrap{height:290px!important}
+.outputBarsHost{max-width:100%!important}
+.overlay,.bulkOverlay,.brandManager{backdrop-filter:blur(4px)!important}
+.modal,.bulkModal,.brandPanel{background:var(--paper-light)!important;color:var(--ink)!important;border-radius:3px!important;border:1px solid var(--ink)!important;box-shadow:5px 7px 0 rgba(52,45,35,.16)!important}
+.saveBtn,.bulkAdd{background:var(--forest)!important;color:#fff!important;border-radius:3px!important}
+.cancel,.bulkBack{border-radius:3px!important}
+#pwReminderBell{background:var(--lemon)!important;border:1px solid var(--ink)!important;border-radius:3px!important;box-shadow:2px 3px 0 var(--ink)!important;width:38px!important;height:37px!important;margin-left:2px!important}
+#pwReminderPanel{background:var(--paper-light)!important;color:var(--ink)!important;border:1px solid var(--ink)!important;border-radius:3px!important;box-shadow:4px 5px 0 rgba(52,45,35,.18)!important;font-family:ui-rounded,"Avenir Next",system-ui,sans-serif!important}
+#pwReminderPanel .pw-reminder-head{border-bottom:1px dashed var(--line)!important}
+#pwReminderPanel .pw-reminder-head h3,#pwReminderPanel h3{color:var(--forest)!important}
+#pwReminderPanel button:not(#pwReminderClose){background:var(--forest)!important;color:white!important;border:1px solid var(--forest)!important;border-radius:3px!important}
+#pwReminderPanel #pwReminderClose{border:1px solid var(--ink)!important;border-radius:3px!important;background:var(--paper-light)!important;color:var(--ink)!important}
+#pwReminderPanel .pw-notice{background:#EEF3D3!important;border:1px solid var(--ink)!important;border-left:4px solid var(--green)!important;border-radius:2px!important;box-shadow:2px 2px 0 rgba(52,45,35,.08)!important}
+#pwReminderPanel .pw-current{background:var(--lemon)!important;border-left-color:var(--coral)!important}
+#pwReminderPanel input[type=time]{background:#fffdf8!important;color:var(--ink)!important;border:1px solid var(--ink)!important;border-radius:3px!important}
+#pwReminderToast{background:var(--forest)!important;color:#fff!important;border:1px solid var(--ink)!important;border-radius:3px!important;box-shadow:3px 4px 0 rgba(52,45,35,.2)!important}
+@media(max-width:780px){.app{padding:25px 13px 55px!important}.app>.top{margin-bottom:22px!important;flex-wrap:wrap!important}.top .logo{font-size:27px!important}.app>.summary{grid-template-columns:1fr!important;gap:12px!important;min-height:125px!important}.tasksHead{align-items:flex-start!important;flex-direction:column!important}.tasksHeadActions{width:100%!important}.tasksHeadActions .add{flex:1!important}.app>.card,.app>.card:not(.summary){padding:14px!important}.app .chartWrap{height:260px!important}}
+@media(max-width:420px){.app>.top{gap:10px!important}.top .autosave{order:3!important;margin-left:0!important}.app>.summary{padding:18px!important}.tabs .tab{padding:8px 10px!important;font-size:11px!important}.controls .search{width:100%!important}.app>.card h2{font-size:17px!important}#pwReminderPanel{right:9px!important;top:66px!important;width:calc(100vw - 18px)!important;max-height:76vh!important}}
