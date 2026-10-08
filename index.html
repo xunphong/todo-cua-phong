@@ -1818,7 +1818,7 @@ body:before{
 @media(max-width:650px){.pw-pin-pad{display:grid}.pw-pin-box{padding:24px 20px}.pw-pin-form input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}.pw-pin-form button{margin-top:0}.pw-pin-box p{margin-bottom:15px}}
 </style></head>
 <body>
-<div id="pwPinLayer" class="pw-pin-layer" role="dialog" aria-modal="true" aria-labelledby="pwPinHeading"><div class="pw-pin-box"><div class="pw-pin-badge" aria-hidden="true">🔒</div><h1 id="pwPinHeading">PHONG WORK</h1><p>Không gian làm việc riêng tư của bạn</p><form id="pwPinForm" class="pw-pin-form" autocomplete="off"><input id="pwPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" minlength="6" placeholder="••••••" aria-label="Mã PIN gồm sáu chữ số" autocomplete="off"><div class="pw-pin-pad" id="pwPinPad"><button type="button" class="pw-pin-num" data-pin-key="1">1</button><button type="button" class="pw-pin-num" data-pin-key="2">2</button><button type="button" class="pw-pin-num" data-pin-key="3">3</button><button type="button" class="pw-pin-num" data-pin-key="4">4</button><button type="button" class="pw-pin-num" data-pin-key="5">5</button><button type="button" class="pw-pin-num" data-pin-key="6">6</button><button type="button" class="pw-pin-num" data-pin-key="7">7</button><button type="button" class="pw-pin-num" data-pin-key="8">8</button><button type="button" class="pw-pin-num" data-pin-key="9">9</button><span></span><button type="button" class="pw-pin-num" data-pin-key="0">0</button><button type="button" class="pw-pin-num" data-pin-key="back" aria-label="Xóa một số">⌫</button></div><button id="pwPinSubmit" type="submit">Mở khóa →</button></form><p class="pw-pin-message" id="pwPinMessage" role="status">Bản Preview giao diện. Xác thực PIN phía máy chủ chưa được kích hoạt; dữ liệu Supabase vẫn được bảo vệ.</p></div></div><div class="app"><div id="pwPreviewSafety" style="background:#fff0d7;border:1px solid #e4b967;color:#6f4917;padding:11px 14px;border-radius:10px;margin:8px 0 15px;font-size:12px;font-weight:700">🔒 PREVIEW CHỈ XEM · Dữ liệu task đang dùng chung Supabase với app chính. Mọi thao tác thêm, sửa, xóa, tích hoàn thành đều bị khóa để tránh ảnh hưởng dữ liệu thật.</div>
+<div id="pwPinLayer" class="pw-pin-layer" role="dialog" aria-modal="true" aria-labelledby="pwPinHeading"><div class="pw-pin-box"><div class="pw-pin-badge" aria-hidden="true">🔒</div><h1 id="pwPinHeading">PHONG WORK</h1><p>Không gian làm việc riêng tư của bạn</p><form id="pwPinForm" class="pw-pin-form" autocomplete="off"><input id="pwPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" minlength="6" placeholder="••••••" aria-label="Mã PIN gồm sáu chữ số" autocomplete="off"><div class="pw-pin-pad" id="pwPinPad"><button type="button" class="pw-pin-num" data-pin-key="1">1</button><button type="button" class="pw-pin-num" data-pin-key="2">2</button><button type="button" class="pw-pin-num" data-pin-key="3">3</button><button type="button" class="pw-pin-num" data-pin-key="4">4</button><button type="button" class="pw-pin-num" data-pin-key="5">5</button><button type="button" class="pw-pin-num" data-pin-key="6">6</button><button type="button" class="pw-pin-num" data-pin-key="7">7</button><button type="button" class="pw-pin-num" data-pin-key="8">8</button><button type="button" class="pw-pin-num" data-pin-key="9">9</button><span></span><button type="button" class="pw-pin-num" data-pin-key="0">0</button><button type="button" class="pw-pin-num" data-pin-key="back" aria-label="Xóa một số">⌫</button></div><button id="pwPinSubmit" type="submit">Mở khóa →</button></form><p class="pw-pin-message" id="pwPinMessage" role="status">Đang kiểm tra quyền truy cập an toàn…</p></div></div><div class="app"><div id="pwPreviewSafety" style="background:#fff0d7;border:1px solid #e4b967;color:#6f4917;padding:11px 14px;border-radius:10px;margin:8px 0 15px;font-size:12px;font-weight:700">🔒 PREVIEW CHỈ XEM · Dữ liệu task đang dùng chung Supabase với app chính. Mọi thao tác thêm, sửa, xóa, tích hoàn thành đều bị khóa để tránh ảnh hưởng dữ liệu thật.</div>
  <div class="top"><div class="logo">PHONG WORK</div><div class="autosave" id="saveState">● Auto saved</div></div>
  <section class="card summary"><div><div class="label">TODAY</div><div class="dateBig" id="dateText"></div><div class="small" id="todayText"></div></div><div><div class="progressLine"><span>Daily progress</span><strong id="todayPct">0%</strong></div><div class="track"><div class="fill" id="todayFill"></div></div></div></section>
 
@@ -2451,5 +2451,37 @@ let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{w
  const menu=document.querySelector('#brandMenu');
  if(picker&&menu&&!picker.contains(e.target))menu.classList.remove('show');
 });
-loadTasks();
-</script><script src="reminders.js?v=3" defer></script><script id="pwPinPreviewLogic">(function(){const form=document.getElementById('pwPinForm'),input=document.getElementById('pwPinInput'),msg=document.getElementById('pwPinMessage');document.querySelectorAll('[data-pin-key]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.pinKey;input.value=key==='back'?input.value.slice(0,-1):(input.value+key).replace(/\D/g,'').slice(0,6)}));form.addEventListener('submit',e=>{e.preventDefault();input.value='';msg.textContent='Chưa thể mở khóa: xác thực PIN an toàn phía Supabase chưa được kết nối. Không có dữ liệu nào bị thay đổi.'});})();</script></body></html>
+window.pwStartAfterUnlock=()=>loadTasks();
+</script><script src="reminders.js?v=3" defer></script><script id="pwPinPreviewLogic">(function(){
+ const form=document.getElementById('pwPinForm'),input=document.getElementById('pwPinInput'),msg=document.getElementById('pwPinMessage'),btn=document.getElementById('pwPinSubmit'),layer=document.getElementById('pwPinLayer');
+ document.querySelectorAll('[data-pin-key]').forEach(el=>el.addEventListener('click',()=>{const k=el.dataset.pinKey;input.value=k==='back'?input.value.slice(0,-1):(input.value+k).replace(/\D/g,'').slice(0,6)}));
+ async function getSession(){
+  let {data:{session},error}=await db.auth.getSession();
+  if(error)throw error;
+  if(!session){const res=await db.auth.signInAnonymously();if(res.error)throw res.error;session=res.data.session;}
+  return session;
+ }
+ async function unlockWithExistingSession(){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session)return false;
+  const {data,error}=await db.rpc('pw_has_access');
+  if(error||!data)return false;
+  layer.hidden=true;window.pwStartAfterUnlock?.();return true;
+ }
+ (async()=>{try{if(await unlockWithExistingSession())return;msg.textContent='Nhập mã PIN 6 số để mở khóa dữ liệu riêng tư.'}catch(e){msg.textContent='Không thể kiểm tra phiên đăng nhập. Vui lòng kết nối mạng và thử lại.'}})();
+ form.addEventListener('submit',async e=>{
+  e.preventDefault();const pin=input.value;input.value='';
+  if(!/^\d{6}$/.test(pin)){msg.textContent='PIN phải có đúng 6 chữ số.';return}
+  btn.disabled=true;msg.textContent='Đang xác minh an toàn…';
+  try{
+   await getSession();
+   const {data,error}=await db.rpc('pw_unlock',{p_pin:pin});
+   if(error)throw error;
+   if(!data){msg.textContent='PIN không đúng hoặc tạm khóa do nhập sai nhiều lần. Hãy thử lại sau.';return}
+   layer.hidden=true;window.pwStartAfterUnlock?.();
+  }catch(err){
+   console.error('PIN authentication unavailable',err);
+   msg.textContent='Chưa thể xác thực. Có thể Supabase chưa bật đăng nhập ẩn danh; dữ liệu vẫn đang khóa.';
+  }finally{btn.disabled=false}
+ });
+})();</script></body></html>
