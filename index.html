@@ -2185,7 +2185,7 @@ document.addEventListener('keydown',e=>{
 loadTasks();renderBrandRows()
 }
 
-async function renameBrand(id){
+async function renameBrand(id){if(!pwCanEdit())return;
  const name=$('#brand-'+id).value.trim();if(!name)return;
  const color=normalizeHex($('#brandHex-'+id).value); if(!color){alert('Mã màu chưa đúng. Ví dụ: #7FA4D6 hoặc #FFF');return} const {error}=await db.from('brands').update({name,color}).eq('id',id);
  if(error){alert(error.code==='23505'?'Tên brand bị trùng.':'Không sửa được brand.');return}
