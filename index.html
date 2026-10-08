@@ -1950,18 +1950,46 @@ document.addEventListener('input',e=>{
 
 function openCurrentSource(){const u=$('#sourceUrl').value.trim();if(validHttpUrl(u))window.open(u,'_blank','noopener,noreferrer')}
 
+const PW_CACHE_KEY='phong-work-readonly-cache-v1';
+let pwOfflineReadOnly=false;
+function pwReadCache(){
+ try{const cached=JSON.parse(localStorage.getItem(PW_CACHE_KEY)||'null');
+  if(!cached||!Array.isArray(cached.tasks)||!Array.isArray(cached.brands))return false;
+  tasks=cached.tasks;brands=cached.brands;renderBrandSelect();renderTasks();
+  setSaveState('● Offline · chỉ xem dữ liệu lưu '+new Date(cached.savedAt).toLocaleString('vi-VN'));
+  pwOfflineReadOnly=true;return true;
+ }catch(e){console.warn('Cached task data unreadable',e);return false}
+}
+function pwCanEdit(){
+ if(!navigator.onLine||pwOfflineReadOnly){alert('Đang ở chế độ offline / chỉ xem. Hãy kết nối Internet và đồng bộ lại trước khi sửa task.');return false}
+ return true;
+}
 async function loadTasks(){
- setSaveState('● Syncing...');
+ if(!navigator.onLine){
+  pwOfflineReadOnly=true;
+  if(!pwReadCache())setSaveState('● Offline · chưa có dữ liệu đã lưu');
+  return;
+ }
+ setSaveState('● Đang đồng bộ...');
  const [taskRes,brandRes]=await Promise.all([
-   db.from('tasks').select('*,brands(id,name)').order('task_date',{ascending:true}),
-   db.from('brands').select('*').order('name',{ascending:true})
+  db.from('tasks').select('*,brands(id,name)').order('task_date',{ascending:true}),
+  db.from('brands').select('*').order('name',{ascending:true})
  ]);
- if(taskRes.error||brandRes.error){setSaveState('● Sync error');console.error(taskRes.error||brandRes.error);return}
+ if(taskRes.error||brandRes.error){
+  console.warn('Supabase sync failed:',taskRes.error||brandRes.error);
+  pwOfflineReadOnly=true;
+  if(!pwReadCache())setSaveState('● Không đồng bộ được · chưa có cache');
+  return;
+ }
  brands=brandRes.data||[];
  tasks=(taskRes.data||[]).map(r=>{const m=unpackMeta(r.note||'');return {id:r.id,name:r.name,date:r.task_date,cat:r.category,note:m.note,sourceUrl:m.sourceUrl,voiceScript:m.voiceScript,priority:m.priority||'normal',done:r.done,brandId:r.brand_id||null,brand:r.brands?.name||'',platforms:Array.isArray(r.platforms)?r.platforms:[]}});
- renderBrandSelect();
- setSaveState('● Synced');renderTasks()
+ pwOfflineReadOnly=false;
+ try{localStorage.setItem(PW_CACHE_KEY,JSON.stringify({tasks,brands,savedAt:Date.now()}))}catch(e){console.warn('Offline cache unavailable',e)}
+ renderBrandSelect();setSaveState('● Đã đồng bộ');renderTasks();
 }
+window.addEventListener('online',()=>loadTasks());
+window.addEventListener('offline',()=>{pwOfflineReadOnly=true;pwReadCache();});
+
 function dateLabel(v){return new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(v+'T00:00:00'))}
 function setMode(el){mode=el.dataset.mode;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderTasks();const v=$('#tasksViewport');if(v)v.scrollTop=0}
 function currentMonthDone(){return tasks.filter(t=>t.done&&t.date.startsWith(reportMonth))}
@@ -2132,7 +2160,7 @@ function previewBrandHex(id,v){
  const c=normalizeHex(v),sw=$('#swatch-'+id);
  if(sw)sw.style.background=c||'#D9DDE3';
 }
-async function saveBrandHex(id,v){
+async function saveBrandHex(id,v){if(!pwCanEdit())return;
  const color=normalizeHex(v);if(!color)return;
  const {error}=await db.from('brands').update({color}).eq('id',id);
  if(error){setSaveState('● Sync error');return}
@@ -2141,7 +2169,7 @@ async function saveBrandHex(id,v){
  previewBrandHex(id,color);renderBrandSelect();updateBrandChart();renderTasks();setSaveState('● Synced');
 }
 
-async function addBrand(){
+async function addBrand(){if(!pwCanEdit())return;
  const name=$('#newBrandName').value.trim();if(!name)return;
  const {error}=await db.from('brands').insert({name});
  if(error){alert(error.code==='23505'?'Brand này đã có rồi.':'Không thêm được brand.');return}
@@ -2163,7 +2191,7 @@ async function renameBrand(id){
  if(error){alert(error.code==='23505'?'Tên brand bị trùng.':'Không sửa được brand.');return}
  await loadTasks();renderBrandRows()
 }
-async function removeBrand(id){
+async function removeBrand(id){if(!pwCanEdit())return;
  const used=tasks.some(t=>t.brandId===id);
  const msg=used?'Brand này đã có task cũ. Xóa khỏi danh sách chọn nhưng vẫn giữ nguyên task và báo cáo cũ?':'Xóa brand này khỏi danh sách?';
  if(!confirm(msg))return;
@@ -2229,7 +2257,7 @@ function openTaskSource(id){
 }
 
 function taskPrimaryAction(e,id){editTask(id)}
-async function toggle(id){
+async function toggle(id){if(!pwCanEdit())return;
  const t=tasks.find(x=>x.id===id);if(!t)return;
  const previous=t.done;
  t.done=!previous;
@@ -2287,7 +2315,7 @@ function setCat(c){selectedCat=c;document.querySelectorAll('.choice').forEach(x=
 function openModal(){editingId=null;selectedPlatforms=[];selectedDate=TODAY;calendarCursor=new Date();$('#modalTitle').textContent='Thêm công việc';$('#saveBtn').textContent='Thêm task';$('#deleteBtn').style.display='none';$('#name').value='';$('#note').value='';$('#sourceUrl').value='';$('#voiceScript').value='';$('#brandSelect').value='';renderBrandSelect();$('#dateDisplay').textContent=dateLabel(TODAY);setCat('Edit Video');setPriority('normal');renderCalendar();$('#overlay').classList.add('show');autoGrowTaskAreas();setTimeout(()=>$('#name').focus(),180)}
 function editTask(id){let t=tasks.find(x=>x.id===id);editingId=id;selectedPlatforms=[...(t.platforms||[])];selectedDate=t.date;calendarCursor=new Date(t.date+'T00:00:00');$('#modalTitle').textContent='Chỉnh sửa công việc';$('#saveBtn').textContent='Lưu thay đổi';$('#deleteBtn').style.display='block';$('#name').value=t.name;$('#note').value=t.note||'';$('#sourceUrl').value=t.sourceUrl||'';$('#voiceScript').value=t.voiceScript||'';$('#brandSelect').value=t.brandId||'';renderBrandSelect();$('#dateDisplay').textContent=dateLabel(t.date);setCat(t.cat);setPriority(t.priority||'normal');renderCalendar();$('#overlay').classList.add('show');autoGrowTaskAreas()}
 function closeModal(){$('#overlay').classList.remove('show');$('#calendarPopup').classList.remove('open')}
-async function saveTask(){
+async function saveTask(){if(!pwCanEdit())return;
  let name=$('#name').value.trim();if(!name)return $('#name').focus();
  setSaveState('● Saving...');
  const payload={name,task_date:selectedDate,category:selectedCat,note:packMeta($('#note').value,$('#sourceUrl').value,$('#voiceScript').value,selectedPriority),brand_id:$('#brandSelect').value?Number($('#brandSelect').value):null,platforms:selectedCat==='Đăng Bài'?selectedPlatforms:[]};
@@ -2297,7 +2325,7 @@ async function saveTask(){
  if(res.error){console.error(res.error);setSaveState('● Sync error');return}
  closeModal();await loadTasks()
 }
-async function deleteEditing(){
+async function deleteEditing(){if(!pwCanEdit())return;
  if(editingId===null)return;
  setSaveState('● Saving...');
  const {error}=await db.from('tasks').delete().eq('id',editingId);
@@ -2401,7 +2429,7 @@ function renderBulkPlatforms(){
  box.innerHTML=PLATFORM_OPTIONS.map(p=>`<button type="button" class="platformChoice ${bulkPlatforms.includes(p)?'active':''}" onclick="toggleBulkPlatform('${p}')">${bulkPlatforms.includes(p)?'✓ ':''}${p}</button>`).join('');
 }
 function toggleBulkPlatform(p){bulkPlatforms=bulkPlatforms.includes(p)?bulkPlatforms.filter(x=>x!==p):[...bulkPlatforms,p];renderBulkPlatforms()}
-async function addBulkTasks(){
+async function addBulkTasks(){if(!pwCanEdit())return;
  if(!bulkItems.length)return;
  const date=$('#bulkDate').value||TODAY;
  const rows=bulkItems.map(x=>({name:x.name,task_date:date,category:bulkCat,note:packMeta('',x.url,''),brand_id:bulkBrandId?Number(bulkBrandId):null,platforms:bulkCat==='Đăng Bài'?bulkPlatforms:[],done:false}));
