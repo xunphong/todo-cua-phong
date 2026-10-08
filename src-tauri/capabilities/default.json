@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Local PHONG WORK desktop windows",
+  "windows": [
+    "main",
+    "focus-reminder"
+  ],
+  "permissions": [
+    "core:default"
+  ]
+}
