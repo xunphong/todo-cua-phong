@@ -105,7 +105,14 @@ const $=id=>root.querySelector('#'+id),title=$('pwFocusTask'),step=$('pwFocusSte
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function elapsed(){return Math.max(0,(state.pausedAt||Date.now())-state.start-state.pausedTotal)}
 function remaining(){return Math.max(0,state.duration*60000-elapsed())}
-function notify(text){if(document.hidden&&'Notification'in window&&Notification.permission==='granted')try{new Notification('PHONG WORK · Focus',{body:text,tag:'phong-focus',icon:'icon-192.png'})}catch{}}
+function returnToFocus(){try{window.focus();if(immersive.hidden){immersive.hidden=false;document.body.style.overflow='hidden'}updateImmersive();}catch(e){console.warn('Focus navigation unavailable',e)}}
+function notify(text,kind='reminder'){
+ if(!document.hidden||!('Notification' in window)||Notification.permission!=='granted')return;
+ try{
+  const alert=new Notification('PHONG WORK · Focus',{body:text,tag:'phong-focus-'+kind,icon:'icon-192.png',requireInteraction:kind==='complete'});
+  alert.onclick=()=>{alert.close();returnToFocus()};
+ }catch(e){console.warn('Desktop notification unavailable',e)}
+}
 function draw(){
 title.value=state.title;step.value=state.nextStep;
 root.querySelectorAll('[data-min]').forEach(b=>b.classList.toggle('active',+b.dataset.min===state.duration));
@@ -122,6 +129,6 @@ $('pwFocusEnd').addEventListener('click',()=>{state.active=false;state.finished=
 root.querySelectorAll('[data-review]').forEach(b=>b.addEventListener('click',()=>{const action=b.dataset.review;if(action==='continue'){state={...state,duration:15,start:Date.now(),pausedAt:0,pausedTotal:0,active:true,finished:false,reminded:false};notif15=false;notifiedEnd=false}else{state.active=false;state.finished=false;state.start=0;if(action==='done')status.textContent='Đã ghi nhận kết thúc phiên. Task chính chưa tự đánh dấu hoàn thành.'}save();draw()}));
 $('pwFocusCollapse').addEventListener('click',()=>{const x=$('pwFocusContent');x.hidden=!x.hidden;$('pwFocusCollapse').textContent=x.hidden?'Mở rộng':'Thu gọn'});
 function tick(){if(!state.active||state.pausedAt)return;const passed=elapsed();if(passed>=900000&&!state.reminded&&state.duration>15){state.reminded=true;save();if(document.hidden)notify('Bạn còn đang dựng video chứ? Quay lại bước đang làm nhé 🎬')}
-if(remaining()<=0){state.active=false;state.finished=true;save();draw();notify('Hết giờ Focus! Bạn đã làm đến đâu rồi?');if(!document.hidden)root.scrollIntoView({behavior:'smooth',block:'center'})}else clock.textContent=String(Math.floor(Math.ceil(remaining()/1000)/60)).padStart(2,'0')+':'+String(Math.ceil(remaining()/1000)%60).padStart(2,'0')}
+if(remaining()<=0){state.active=false;state.finished=true;save();draw();notify('Hết giờ Focus! Bạn đã làm đến đâu rồi?','complete');if(!document.hidden)root.scrollIntoView({behavior:'smooth',block:'center'})}else clock.textContent=String(Math.floor(Math.ceil(remaining()/1000)/60)).padStart(2,'0')+':'+String(Math.ceil(remaining()/1000)%60).padStart(2,'0')}
 draw();tick();setInterval(()=>{tick();if(!immersive.hidden)updateImmersive()},1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){tick();draw()}});
 })();
