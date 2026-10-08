@@ -1,0 +1,10 @@
+import {mkdir,copyFile,readFile,writeFile} from 'node:fs/promises';
+import {join} from 'node:path';
+const out='desktop-dist';await mkdir(out,{recursive:true});
+for(const path of ['index.html','focus.js','reminders.js','manifest.webmanifest'])await copyFile(path,join(out,path));
+await copyFile('desktop/reminder.html',join(out,'reminder.html'));
+await copyFile('desktop/bridge.js',join(out,'bridge.js'));
+let html=await readFile(join(out,'index.html'),'utf8');
+html=html.replace('</body>','<script src="bridge.js"></script></body>');
+await writeFile(join(out,'index.html'),html);
+console.log('PHONG WORK Desktop assets prepared, original website untouched');
