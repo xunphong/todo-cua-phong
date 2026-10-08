@@ -1812,10 +1812,9 @@ body:before{
 }
 </style>
 
-<link rel="stylesheet" href="dashboard-v2.css?v=6">
 </head>
 <body>
-<div class="app">
+<div class="app"><div id="pwPreviewSafety" style="background:#fff0d7;border:1px solid #e4b967;color:#6f4917;padding:11px 14px;border-radius:10px;margin:8px 0 15px;font-size:12px;font-weight:700">🔒 PREVIEW CHỈ XEM · Dữ liệu task đang dùng chung Supabase với app chính. Mọi thao tác thêm, sửa, xóa, tích hoàn thành đều bị khóa để tránh ảnh hưởng dữ liệu thật.</div>
  <div class="top"><div class="logo">PHONG WORK</div><div class="autosave" id="saveState">● Auto saved</div></div>
  <section class="card summary"><div><div class="label">TODAY</div><div class="dateBig" id="dateText"></div><div class="small" id="todayText"></div></div><div><div class="progressLine"><span>Daily progress</span><strong id="todayPct">0%</strong></div><div class="track"><div class="fill" id="todayFill"></div></div></div></section>
 
@@ -1961,6 +1960,7 @@ function pwReadCache(){
  }catch(e){console.warn('Cached task data unreadable',e);return false}
 }
 function pwCanEdit(){
+ alert('Đây là bản Preview chỉ để xem và thử giao diện. Để bảo vệ dữ liệu, vui lòng sửa task trên app chính.');return false;
  if(!navigator.onLine||pwOfflineReadOnly){alert('Đang ở chế độ offline / chỉ xem. Hãy kết nối Internet và đồng bộ lại trước khi sửa task.');return false}
  return true;
 }
