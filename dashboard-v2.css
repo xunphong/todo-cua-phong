@@ -62,3 +62,47 @@ button,input,select,textarea{font-family:inherit!important}
 #pwReminderToast{background:var(--forest)!important;color:#fff!important;border:1px solid var(--ink)!important;border-radius:3px!important;box-shadow:3px 4px 0 rgba(52,45,35,.2)!important}
 @media(max-width:780px){.app{padding:25px 13px 55px!important}.app>.top{margin-bottom:22px!important;flex-wrap:wrap!important}.top .logo{font-size:27px!important}.app>.summary{grid-template-columns:1fr!important;gap:12px!important;min-height:125px!important}.tasksHead{align-items:flex-start!important;flex-direction:column!important}.tasksHeadActions{width:100%!important}.tasksHeadActions .add{flex:1!important}.app>.card,.app>.card:not(.summary){padding:14px!important}.app .chartWrap{height:260px!important}}
 @media(max-width:420px){.app>.top{gap:10px!important}.top .autosave{order:3!important;margin-left:0!important}.app>.summary{padding:18px!important}.tabs .tab{padding:8px 10px!important;font-size:11px!important}.controls .search{width:100%!important}.app>.card h2{font-size:17px!important}#pwReminderPanel{right:9px!important;top:66px!important;width:calc(100vw - 18px)!important;max-height:76vh!important}}
+
+/* Visual refinement v3: quiet neutral surfaces, consistently rounded corners */
+:root{--paper:#F7F8F7;--paper-light:#FFFFFF;--lime:#E9F0DE;--lemon:#F1F5EA;--green:#87AD85;--coral:#D98A7F;--ink:#2C3633;--forest:#385A48;--muted:#79857F;--line:#E1E7E2;--shadow:0 3px 15px rgba(34,57,44,.055)}
+body{background:#F7F8F7!important;background-image:none!important}
+.app{max-width:1130px!important;padding-top:25px!important}
+.app>.top{border-left:0!important;padding:0!important;margin-bottom:20px!important}
+.top .logo{font-size:clamp(23px,3vw,30px)!important;letter-spacing:-.035em!important}
+.top .logo:before{color:#778B7A!important;font-size:10px!important;margin-bottom:5px!important}
+.top .autosave{box-shadow:none!important;border-color:#E0E6DF!important;border-radius:10px!important;background:white!important}
+.app>.card,.app>.summary,.app>.card:not(.summary){background:#fff!important;border:1px solid #E1E7E2!important;border-radius:14px!important;box-shadow:0 3px 15px rgba(34,57,44,.055)!important;transform:none!important}
+.app>.summary{background:#F0F5EA!important;min-height:122px!important}
+.app>.summary:after{display:none!important}
+.summary .track{border:0!important;border-radius:99px!important;background:#DEE8DC!important}
+.summary .fill{border-radius:99px!important;background:#6F9975!important}
+.app>.tasksCard{border-top:1px solid #E1E7E2!important}
+.app>.monthCard,.app>.monthCard:nth-of-type(even){border-top:1px solid #E1E7E2!important}
+.app>.card h2:before{color:#8AB197!important}
+.tabs{background:#F1F4F1!important;border:1px solid #E4E9E4!important;border-radius:11px!important;padding:5px!important;gap:4px!important;width:fit-content!important;max-width:100%!important;box-shadow:none!important}
+.tabs .tab{border-radius:8px!important;padding:9px 16px!important;color:#64786C!important}
+.tabs .tab.active{background:#496C54!important;color:#fff!important;border-color:transparent!important;box-shadow:none!important}
+.controls{display:grid!important;grid-template-columns:minmax(200px,1fr) max-content max-content!important;align-items:center!important;gap:10px!important}
+.controls .search{width:100%!important;min-width:0!important}
+.search,.monthBtn,.filterBtn{min-height:41px!important;border-radius:10px!important;background:#fff!important;border:1px solid #DDE5DD!important;box-shadow:none!important;color:#526357!important}
+.app .monthBtn,.app .filterBtn{box-shadow:none!important}
+.app .monthBtn:hover,.app .filterBtn:hover,.search:hover{border-color:#9BB59F!important;background:#F9FBF9!important}
+.add,.add.secondary{border-radius:10px!important;box-shadow:none!important}
+.add{background:#446952!important;border-color:#446952!important}
+.add.secondary{background:#EEF3EB!important;border-color:#D7E3D7!important;color:#48654B!important}
+.task{background:#fff!important;border:1px solid #E4E9E4!important;border-left:3px solid #91B398!important;border-radius:11px!important;box-shadow:none!important;padding:13px 14px!important}
+.task:hover{background:#FBFDFB!important;transform:none!important;border-color:#ADC5B1!important}
+.task.done{background:#F5F8F3!important;border-color:#E3EBE1!important;border-left:3px solid #8FA58C!important;opacity:1!important}
+.groupHead{background:transparent!important;border-bottom:1px solid #E5EAE6!important}
+.modal,.bulkModal,.brandPanel{background:#fff!important;border:1px solid #E1E7E2!important;border-radius:16px!important;box-shadow:0 20px 55px rgba(20,42,30,.15)!important}
+.saveBtn,.bulkAdd,.cancel,.bulkBack{border-radius:10px!important}
+#pwReminderBell{background:#F2F5EF!important;border:1px solid #DEE6DE!important;box-shadow:none!important;border-radius:10px!important}
+#pwReminderPanel{background:#fff!important;border:1px solid #E1E7E2!important;box-shadow:0 16px 45px rgba(20,42,30,.14)!important;border-radius:14px!important}
+#pwReminderPanel button:not(#pwReminderClose){border-radius:9px!important;background:#486B53!important;border-color:#486B53!important}
+#pwReminderPanel #pwReminderClose{border-radius:8px!important;border-color:#E1E7E2!important}
+#pwReminderPanel .pw-notice{background:#F7FAF6!important;border:1px solid #E4EAE3!important;border-left:3px solid #9CB6A0!important;border-radius:10px!important;box-shadow:none!important}
+#pwReminderPanel .pw-current{background:#F0F5EA!important}
+#pwReminderPanel input[type=time]{border-radius:8px!important;border-color:#DDE6DD!important}
+#pwReminderToast{border-radius:10px!important}
+@media(max-width:720px){.controls{grid-template-columns:minmax(0,1fr) minmax(110px,max-content) minmax(90px,max-content)!important;gap:7px!important}}
+@media(max-width:520px){.controls{grid-template-columns:1fr 1fr!important}.controls .search{grid-column:1/-1!important}.controls .monthPicker,.controls .filter{min-width:0!important}.controls .monthBtn,.controls .filterBtn{width:100%!important}.tabs{width:100%!important}.tabs .tab{flex:1!important;padding:8px 5px!important;font-size:11px!important}.app>.summary{grid-template-columns:1fr!important}}
