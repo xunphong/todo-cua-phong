@@ -7,6 +7,7 @@ const root=document.createElement('section');root.id='pwFocus';root.className='p
 <div class="pw-focus-head"><div><span class="pw-focus-kicker">FOCUS MODE</span><h2>Chỉ một việc trước mắt 🎬</h2></div><button id="pwFocusCollapse" class="pw-focus-min">Thu gọn</button></div>
 <div id="pwFocusContent">
 <label class="pw-focus-label" for="pwFocusSaved">Chọn từ task chưa hoàn thành</label>
+<div id="pwFocusSelected" class="pw-focus-selected" hidden><div class="pw-focus-selected-copy"><span class="pw-focus-selected-kicker">✓ Task đang chọn</span><strong id="pwFocusSelectedName"></strong><small id="pwFocusSelectedMeta"></small></div><button type="button" id="pwFocusChange">Chọn lại</button></div>
 <div class="pw-focus-task-list" id="pwFocusSaved"><div class="pw-focus-loading">Đang tải công việc…</div></div>
 <input id="pwFocusTask" type="hidden">
 <label class="pw-focus-label" for="pwFocusStep">Bước tiếp theo / điểm dừng</label>
@@ -33,6 +34,7 @@ const style=document.createElement('style');style.textContent=`
 .pw-focus{padding:21px 24px;margin-top:15px}.pw-focus-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.pw-focus-head h2{font-family:var(--pw-font-heading,"Montserrat",system-ui,sans-serif);font-weight:600;font-size:17px;margin:3px 0 14px}.pw-focus-kicker{font-weight:800;color:var(--video);font-size:10px;letter-spacing:.1em}.pw-focus-min{background:#eaf0fa;color:#35577f;border:none;border-radius:10px;padding:10px 12px;cursor:pointer;font-size:11px}.pw-focus-label{display:block;font-size:11px;color:#697991;font-weight:700;margin:12px 0 6px}.pw-focus input,.pw-focus textarea{width:100%;border:1px solid #e0e7f0;background:#fff;border-radius:12px;padding:11px 13px;outline:none;color:var(--ink);font-size:13px;resize:vertical}.pw-focus input:focus,.pw-focus textarea:focus{border-color:var(--video)}.pw-focus-times{margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.pw-focus-times button{border:0;border-radius:10px;padding:9px 12px;background:#f0f2f7;color:#526078;cursor:pointer}.pw-focus-times button.active{background:#dce8ff;color:#245caa;font-weight:800}.pw-focus-clock{font-family:var(--pw-font-heading,"Montserrat",system-ui,sans-serif);text-align:center;font-weight:780;font-size:clamp(76px,10vw,126px);line-height:1.18;font-variant-numeric:tabular-nums;margin:18px 0 10px;letter-spacing:-4px}.pw-focus-status{text-align:center;color:#7a8394;font-size:11px;margin-bottom:14px}.pw-focus-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap}.pw-focus-actions button,.pw-focus-review button{cursor:pointer;border:0;background:var(--video);color:#fff;border-radius:12px;padding:12px 22px;font-size:12px;font-weight:750}.pw-focus-actions button.pw-focus-secondary,.pw-focus-review button:nth-child(2){background:#e8eef8;color:#37577d}.pw-focus-note{font-size:10px;color:#86909e;text-align:center;margin-top:15px;line-height:1.55}.pw-focus-review{background:#edf3fd;border:1px solid #d9e7fc;padding:15px;border-radius:13px;margin-top:15px}.pw-focus-review p{font-size:12px;color:#67768b}.pw-focus-review-actions{display:flex;gap:7px;flex-wrap:wrap}.pw-focus-review button{padding:10px 13px}.pw-focus-review button:nth-child(3){background:#58b88a}#pwFocus[hidden],#pwFocus [hidden]{display:none!important}
 @media(max-width:600px){.pw-focus{padding:18px 15px}.pw-focus-head h2{font-size:16px}.pw-focus-times{align-items:flex-start;flex-direction:column}.pw-focus-times button{min-width:63px}.pw-focus-clock{font-size:clamp(64px,14vw,92px);letter-spacing:-3px}.pw-focus-actions button{flex:1}}
 
+.pw-focus-selected{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#eaf1fd;border:1px solid #d7e4f7;border-radius:12px;padding:15px 16px;margin-bottom:14px}.pw-focus-selected[hidden],.pw-focus-task-list[hidden]{display:none!important}.pw-focus-selected-copy{display:flex;flex-direction:column;gap:5px;min-width:0}.pw-focus-selected-kicker{font-size:10px;font-weight:750;color:#4474bd}.pw-focus-selected-copy strong{font-size:13px;line-height:1.45;color:#232b39;overflow-wrap:anywhere}.pw-focus-selected-copy small{font-size:10px;color:#7a8799}.pw-focus-selected button{flex-shrink:0;border:1px solid #c8dafa;background:#fff;color:#396fbc;border-radius:9px;padding:10px 13px;font-size:12px;font-weight:700;cursor:pointer}.pw-focus-selected button:disabled{opacity:.55;cursor:not-allowed}@media(max-width:600px){.pw-focus-selected{padding:12px;gap:9px}.pw-focus-selected button{padding:9px 10px;font-size:11px}}
 /* Full-screen quiet workspace. CSS-only abstract landscape, no copyrighted image. */
 .pw-focus select{width:100%;border:1px solid #dfe6f1;background:#fff;color:var(--ink);border-radius:12px;padding:11px 13px;font:inherit;font-size:13px;min-height:43px}
 .pw-focus-visual-actions{text-align:center;margin:-2px 0 14px}.pw-focus-visual-actions button{border:1px solid #d9e5f6;background:#edf4ff;color:#38669f;font-size:12px;font-weight:750;padding:11px 14px;border-radius:12px;cursor:pointer}
@@ -55,6 +57,23 @@ const style=document.createElement('style');style.textContent=`
 `;document.head.appendChild(style);
 const tasksCard=document.querySelector('.tasksCard');if(tasksCard)tasksCard.parentNode.insertBefore(root,tasksCard);else document.querySelector('.app')?.appendChild(root);
 const saved=root.querySelector('#pwFocusSaved');
+let pickerExpanded=!state.taskId;
+const selectedCard=root.querySelector('#pwFocusSelected');
+function updatePickerVisibility(){
+ const chosen=availableTasks().find(t=>String(t.id)===String(state.taskId));
+ const hasSelection=!!state.taskId&&!!state.title;
+ selectedCard.hidden=!hasSelection;
+ saved.hidden=hasSelection&&!pickerExpanded;
+ if(hasSelection){
+  root.querySelector('#pwFocusSelectedName').textContent=state.title;
+  root.querySelector('#pwFocusSelectedMeta').textContent=chosen?[chosen.brand,chosen.cat,fmtDate(chosen.date)].filter(Boolean).join(' · '):'Đã lưu từ phiên trước';
+  root.querySelector('#pwFocusChange').disabled=!!state.active;
+ }
+}
+root.querySelector('#pwFocusChange').addEventListener('click',()=>{
+ if(state.active)return;
+ pickerExpanded=true;updatePickerVisibility();saved.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
 function availableTasks(){try{return typeof tasks!=='undefined'&&Array.isArray(tasks)?tasks.filter(t=>!t.done):[]}catch{return []}}
 const fmtDate=d=>/^\d{4}-\d{2}-\d{2}$/.test(d||'')?d.slice(8,10)+'/'+d.slice(5,7)+'/'+d.slice(0,4):(d||'Chưa có ngày');
 let lastSignature='';
@@ -83,14 +102,14 @@ function refreshChoices(){
    button.append(circle,middle,check);
    button.addEventListener('click',()=>{
     if(state.active){status.textContent='Hãy kết thúc phiên đang chạy trước khi đổi task.';return}
-    state.taskId=t.id;state.title=t.name;state.nextStep='';save();lastSignature='';refreshChoices();draw();
+    state.taskId=t.id;state.title=t.name;state.nextStep='';pickerExpanded=false;save();lastSignature='';refreshChoices();draw();
    });
    group.appendChild(button);
   });saved.appendChild(group);
  }
 }
 window.pwRefreshFocusTasks=refreshChoices;
-refreshChoices();
+refreshChoices();updatePickerVisibility();
 const choicesInterval=setInterval(refreshChoices,2000);
 const closeImmersive=()=>{immersive.hidden=true;document.body.style.overflow=''};
 root.querySelector('#pwFocusImmersive').addEventListener('click',()=>{refreshChoices();immersive.hidden=false;document.body.style.overflow='hidden';updateImmersive()});
@@ -118,7 +137,7 @@ root.querySelectorAll('[data-min]').forEach(b=>b.classList.toggle('active',+b.da
 const secs=state.active?Math.ceil(remaining()/1000):state.finished?0:state.duration*60;clock.textContent=String(Math.floor(secs/60)).padStart(2,'0')+':'+String(secs%60).padStart(2,'0');
 status.textContent=state.finished?'Phiên đã kết thúc. Bạn có thể lưu điểm dừng.':state.active?(state.pausedAt?'Đang tạm dừng':'Đang tập trung · thông báo Windows khi hết giờ'):'Sẵn sàng bắt đầu';
 $('pwFocusStart').hidden=state.active||state.finished;
-$('pwFocusPause').hidden=!state.active;$('pwFocusPause').textContent=state.pausedAt?'Tiếp tục':'Tạm dừng';$('pwFocusEnd').hidden=!state.active;review.hidden=!state.finished;updateImmersive();
+$('pwFocusPause').hidden=!state.active;$('pwFocusPause').textContent=state.pausedAt?'Tiếp tục':'Tạm dừng';$('pwFocusEnd').hidden=!state.active;review.hidden=!state.finished;updatePickerVisibility();updateImmersive();
 }
 title.addEventListener('input',()=>{state.title=title.value;state.taskId=null;save();refreshChoices()});step.addEventListener('input',()=>{state.nextStep=step.value;save()});
 root.querySelectorAll('[data-min]').forEach(b=>b.addEventListener('click',()=>{if(state.active)return;state.duration=+b.dataset.min;state.finished=false;save();draw()}));
