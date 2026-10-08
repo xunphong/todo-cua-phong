@@ -23,11 +23,12 @@ fn show_reminder(app: AppHandle, version: u64) {
         timer.version == version && timer.deadline.is_some()
     };
     if !valid { return; }
+    let ui_app = app.clone();
     let _ = app.run_on_main_thread(move || {
-        let reminder = match app.get_webview_window("focus-reminder") {
+        let reminder = match ui_app.get_webview_window("focus-reminder") {
             Some(existing) => existing,
             None => match WebviewWindowBuilder::new(
-                &app, "focus-reminder", WebviewUrl::App("reminder.html".into())
+                &ui_app, "focus-reminder", WebviewUrl::App("reminder.html".into())
             )
             .title("PHONG WORK · Nhắc tập trung")
             .fullscreen(true)
@@ -100,7 +101,7 @@ fn snooze_focus(app: AppHandle) {
     if timer.deadline.is_some() {
         let version = timer.version;
         drop(timer);
-        schedule(app, version, 300_000);
+        schedule(app.clone(), version, 300_000);
     }
 }
 
