@@ -9,4 +9,5 @@ document.getElementById('later').onclick=()=>api('snooze_focus');
 document.getElementById('dismiss').onclick=()=>api('dismiss_focus');
 document.addEventListener('keydown',e=>{if(e.key==='Escape')api('dismiss_focus')});
 hydrate();
+window.__TAURI__?.event?.listen('pw-reminder-refresh',hydrate).catch(console.warn);
 </script></body></html>
