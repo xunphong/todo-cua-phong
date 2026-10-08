@@ -120,3 +120,42 @@ body{background:#F7F8F7!important;background-image:none!important}
 .task.done .taskTitle{color:#78837B!important}
 .task.done .taskNote{color:#99A39B!important}
 @media(max-width:520px){.groupHead{padding:9px 10px!important}.task{padding:12px 10px!important;gap:10px!important}.taskTitle{font-size:12.5px!important}.taskNote{font-size:10.5px!important}}
+
+/* Approved Cream & Color palette. Layout and behaviors unchanged. */
+:root{--paper:#F6F3EB;--paper-light:#FBFAF7;--lime:#DCE99D;--lemon:#E8F19F;--green:#98C96E;--coral:#EF7F7A;--ink:#342D23;--forest:#384C27;--muted:#766F63;--line:#D9D2C4;--shadow:0 3px 13px rgba(52,45,35,.065)}
+body{background:#F6F3EB!important;background-image:none!important;color:#342D23!important}
+.app>.top{background:transparent!important}
+.top .logo{color:#384C27!important}.top .logo:before{color:#766F63!important}
+.top .autosave{background:#FBFAF7!important;border-color:#D9D2C4!important;color:#384C27!important}
+.app>.card,.app>.card:not(.summary){background:#FBFAF7!important;border-color:#D9D2C4!important;box-shadow:var(--shadow)!important}
+.app>.summary{background:#E8F19F!important;border-color:#D9D2C4!important}
+.summary .label,.summary .dateBig,.summary .small,.summary .progressLine,.summary .progressLine span,.summary .progressLine strong{color:#384C27!important}
+.summary .track{background:#D7E2A0!important}.summary .fill{background:#384C27!important}
+.app>.tasksCard,.app>.monthCard,.app>.monthCard:nth-of-type(even){border-color:#D9D2C4!important;border-top-color:#D9D2C4!important}
+.app>.card h2,.app .brandHead h2{color:#384C27!important}
+.app>.card h2:before{color:#EF7F7A!important}
+.app .small{color:#766F63!important}
+.tabs{background:#EDEEDB!important;border-color:#D9D2C4!important}
+.tabs .tab{color:#4D613B!important}.tabs .tab.active{background:#384C27!important;color:#FBFAF7!important}
+.search,.monthBtn,.filterBtn{background:#FFFDF8!important;border-color:#D9D2C4!important;color:#342D23!important}
+.app .monthBtn:hover,.app .filterBtn:hover,.search:hover{background:#F3F2E3!important;border-color:#A9B991!important}
+.add{background:#384C27!important;border-color:#384C27!important;color:#FBFAF7!important}
+.add.secondary{background:#DCE99D!important;border-color:#C8D79A!important;color:#384C27!important}
+.groupHead{background:#F1EFDF!important;border-color:#E4DDCC!important}.groupHead strong{color:#384C27!important}.groupHead span{color:#766F63!important}
+.task{background:#FFFDF8!important;border-color:#E2DCCD!important;border-left-color:#98C96E!important}
+.task:hover{background:#F4F4E5!important;border-color:#C7D8A8!important}
+.task.done{background:#F0F4DA!important;border-color:#DCE6C4!important;border-left-color:#98C96E!important}
+.taskTitle{color:#342D23!important}.taskNote{color:#766F63!important}.taskBrand{color:#766F63!important}
+.task.done .taskTitle{color:#777968!important}.task.done .taskNote{color:#858579!important}
+.monthCard .total strong{color:#384C27!important}
+.modal,.bulkModal,.brandPanel{background:#FBFAF7!important;border-color:#D9D2C4!important;color:#342D23!important}
+.saveBtn,.bulkAdd{background:#384C27!important;color:#FBFAF7!important}
+#pwReminderBell{background:#DCE99D!important;border-color:#C8D79A!important}
+#pwReminderPanel{background:#FBFAF7!important;border-color:#D9D2C4!important;color:#342D23!important}
+#pwReminderPanel h3,#pwReminderPanel .pw-reminder-head h3{color:#384C27!important}
+#pwReminderPanel button:not(#pwReminderClose){background:#384C27!important;border-color:#384C27!important;color:#FBFAF7!important}
+#pwReminderPanel #pwReminderClose{background:#FBFAF7!important;border-color:#D9D2C4!important;color:#384C27!important}
+#pwReminderPanel .pw-notice{background:#F4F2E7!important;border-color:#E5DFCE!important;border-left-color:#98C96E!important}
+#pwReminderPanel .pw-current{background:#E8F19F!important;border-left-color:#EF7F7A!important}
+#pwReminderPanel input[type=time]{background:#FFFDF8!important;border-color:#D9D2C4!important;color:#342D23!important}
+#pwReminderToast{background:#384C27!important;color:#FBFAF7!important}
