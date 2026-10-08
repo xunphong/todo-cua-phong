@@ -1848,6 +1848,14 @@ body:before{
  .pw-pin-num{height:53px}
  .pw-pin-form button[type=submit]{min-height:46px}
 }
+
+/* Refine PIN to original PHONG WORK card, clearer keyboard, softer background */
+.pw-pin-layer{background:linear-gradient(145deg,var(--bg) 0 48%,var(--bg2) 48% 76%,#d7e2ef 76%)!important}
+.pw-pin-box{background:var(--card)!important;border-radius:20px!important;box-shadow:var(--shadow)!important}
+.pw-pin-num{background:#eef2f8!important;color:#263a57!important;border:1px solid #dbe4f1!important;border-radius:14px!important}
+.pw-pin-num:active{background:#d4e3fa!important}
+.pw-pin-form button[type=submit]{background:var(--video)!important;color:white!important;border-radius:12px!important}
+.pw-pin-dot.filled{background:var(--video)!important;border-color:var(--video)!important}
 </style></head>
 <body>
 <div id="pwPinLayer" class="pw-pin-layer" role="dialog" aria-modal="true" aria-labelledby="pwPinHeading"><div class="pw-pin-box"><div class="pw-pin-badge" aria-hidden="true">🔒</div><h1 id="pwPinHeading">PHONG WORK</h1><p>Không gian làm việc riêng tư của bạn</p><form id="pwPinForm" class="pw-pin-form" autocomplete="off"><input id="pwPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" minlength="6" placeholder="••••••" aria-label="Mã PIN gồm sáu chữ số" autocomplete="off"><div class="pw-pin-dots" id="pwPinDots" aria-label="Số chữ số đã nhập"><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span></div><div class="pw-pin-pad" id="pwPinPad"><button type="button" class="pw-pin-num" data-pin-key="1">1</button><button type="button" class="pw-pin-num" data-pin-key="2">2</button><button type="button" class="pw-pin-num" data-pin-key="3">3</button><button type="button" class="pw-pin-num" data-pin-key="4">4</button><button type="button" class="pw-pin-num" data-pin-key="5">5</button><button type="button" class="pw-pin-num" data-pin-key="6">6</button><button type="button" class="pw-pin-num" data-pin-key="7">7</button><button type="button" class="pw-pin-num" data-pin-key="8">8</button><button type="button" class="pw-pin-num" data-pin-key="9">9</button><span></span><button type="button" class="pw-pin-num" data-pin-key="0">0</button><button type="button" class="pw-pin-num" data-pin-key="back" aria-label="Xóa một số">⌫</button></div><button id="pwPinSubmit" type="submit">Mở khóa →</button></form><p class="pw-pin-message" id="pwPinMessage" role="status">Đang kiểm tra quyền truy cập an toàn…</p></div></div><div class="app">
@@ -2454,7 +2462,7 @@ let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{w
  const menu=document.querySelector('#brandMenu');
  if(picker&&menu&&!picker.contains(e.target))menu.classList.remove('show');
 });
-window.pwStartAfterUnlock=()=>{loadTasks();if(!document.getElementById('pwRemindersScript')){const script=document.createElement('script');script.id='pwRemindersScript';script.src='reminders.js?v=4';document.body.appendChild(script)}};
+window.pwStartAfterUnlock=()=>{loadTasks();if(!document.getElementById('pwRemindersScript')){const script=document.createElement('script');script.id='pwRemindersScript';script.src='reminders.js?v=4';document.body.appendChild(script)}if(!document.getElementById('pwFocusScript')){const focus=document.createElement('script');focus.id='pwFocusScript';focus.src='focus.js?v=1';document.body.appendChild(focus)}};
 </script><script id="pwPinPreviewLogic">(function(){
  const form=document.getElementById('pwPinForm'),input=document.getElementById('pwPinInput'),msg=document.getElementById('pwPinMessage'),btn=document.getElementById('pwPinSubmit'),layer=document.getElementById('pwPinLayer');
  const dots=[...document.querySelectorAll('.pw-pin-dot')];const renderDots=()=>dots.forEach((dot,i)=>dot.classList.toggle('filled',i<input.value.length));input.addEventListener('input',renderDots);document.querySelectorAll('[data-pin-key]').forEach(el=>el.addEventListener('click',()=>{const k=el.dataset.pinKey;input.value=k==='back'?input.value.slice(0,-1):(input.value+k).replace(/\D/g,'').slice(0,6);renderDots()}));
