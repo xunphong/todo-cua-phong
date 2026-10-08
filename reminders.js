@@ -24,10 +24,12 @@
   };
   const message = key => {
     const s = stats();
-    if (key === 'morning') return { title: '☀️ Công việc hôm nay', body: 'Bạn có ' + s.total + ' task hôm nay' + (s.overdue ? ', và ' + s.overdue + ' task quá hạn.' : '.') };
-    if (key === 'noon') return { title: '🍱 Báo cáo giữa trưa', body: 'Đã xong ' + s.done + '/' + s.total + ' task (' + (s.total ? Math.round(s.done/s.total*100) : 100) + '%). Còn ' + s.left + ' task.' };
-    if (key === 'afternoon') return { title: '🕒 Tiến độ lúc 15:00', body: 'Đã hoàn thành ' + s.done + '/' + s.total + ' task. ' + (s.left ? 'Còn ' + s.left + ' task hôm nay.' : 'Hôm nay đã hoàn thành hết!') };
-    if (key === 'end') return s.left + s.overdue ? { title: '🔔 Nhắc việc cuối ngày', body: 'Còn ' + s.left + ' task hôm nay chưa xong' + (s.overdue ? ' và ' + s.overdue + ' task quá hạn.' : '.') } : null;
+    const actualTime = config.times[key] || items.find(x=>x.key===key)?.time || '';
+    const displayTime = actualTime ? actualTime.replace(/^0(?=\d:)/,'') : '';
+    if (key === 'morning') return { title: '☀️ Công việc hôm nay · '+displayTime, body: 'Bạn có ' + s.total + ' task hôm nay' + (s.overdue ? ', và ' + s.overdue + ' task quá hạn.' : '.') };
+    if (key === 'noon') return { title: '🍱 Báo cáo giữa trưa · '+displayTime, body: 'Đã xong ' + s.done + '/' + s.total + ' task (' + (s.total ? Math.round(s.done/s.total*100) : 100) + '%). Còn ' + s.left + ' task.' };
+    if (key === 'afternoon') return { title: '🕒 Tiến độ lúc '+displayTime, body: 'Đã hoàn thành ' + s.done + '/' + s.total + ' task. ' + (s.left ? 'Còn ' + s.left + ' task hôm nay.' : 'Hôm nay đã hoàn thành hết!') };
+    if (key === 'end') return s.left + s.overdue ? { title: '🔔 Nhắc việc cuối ngày · '+displayTime, body: 'Còn ' + s.left + ' task hôm nay chưa xong' + (s.overdue ? ' và ' + s.overdue + ' task quá hạn.' : '.') } : null;
     return null;
   };
   const css = document.createElement('style');
