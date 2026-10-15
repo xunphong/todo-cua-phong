@@ -37,6 +37,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 .markUnfinished{border:1px solid #b7cbe0;border-radius:9px;background:#eef4fb;color:#3d6698;padding:8px 10px;white-space:nowrap;font-size:11px;font-weight:750;cursor:pointer}.markUnfinished:hover{background:#dceafb}
 .pw-auto-plan{margin-top:12px;padding:12px;border:1px solid #d5e1ef;background:#eaf1fa;border-radius:12px;color:#345f94}.pw-auto-plan label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}.pw-auto-plan input{accent-color:#5b8def}.pw-auto-plan #bulkScheduleHint{font-size:11px;margin-top:7px}
 .pw-plan-existing{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}.pw-plan-existing button{background:#eaf1fb;border:1px solid #c9d9ee;border-radius:10px;color:#38649d;font-size:12px;font-weight:750;padding:10px 13px;cursor:pointer}.pw-plan-existing small{font-size:11px;color:#7c8795}
+.pw-plan-overlay{position:fixed;inset:0;z-index:1500;display:none;place-items:center;padding:16px;background:#23304485;backdrop-filter:blur(6px)}.pw-plan-overlay.show{display:grid}.pw-plan-dialog{width:min(850px,100%);max-height:91vh;display:flex;flex-direction:column;background:#f7f5ec;border-radius:19px;padding:20px;box-shadow:0 25px 80px #172a3844;color:#2a352d}.pw-plan-dialog header,.pw-plan-dialog footer{display:flex;justify-content:space-between;align-items:center;gap:12px}.pw-plan-dialog h3{margin:0;font-size:20px}.pw-plan-dialog header p{font-size:12px;color:#667767;margin:5px 0}.pw-plan-dialog header button,.pw-plan-dialog footer button{border:1px solid #d4d8cd;border-radius:10px;padding:10px 14px;background:#fff;cursor:pointer}.pw-plan-dialog footer{margin-top:13px;justify-content:flex-end}.pw-plan-dialog footer #pwPlanConfirm{background:#354b30;color:#fff}.pw-plan-dialog button:disabled{opacity:.5}.pw-plan-dialog #pwPlanStats{background:#e9efdc;padding:12px;border-radius:11px;margin:15px 0;font-size:12px}.pw-plan-table{overflow:auto;min-height:0;border:1px solid #e3e2db;border-radius:11px}.pw-plan-row{display:grid;grid-template-columns:minmax(0,2fr) 110px 132px;gap:12px;padding:11px;border-bottom:1px solid #e5e6dc;font-size:12px;align-items:center}.pw-plan-row strong{overflow-wrap:anywhere}.pw-plan-heading{position:sticky;top:0;background:#e9ebdf;font-weight:750}.pw-plan-row .late{color:#b54232;font-weight:700}@media(max-width:600px){.pw-plan-dialog{padding:12px}.pw-plan-row{grid-template-columns:minmax(0,1.5fr) 78px 85px;font-size:10px;gap:5px;padding:9px 5px}}
 </style>
 
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
@@ -1966,6 +1967,7 @@ body,button,input,select,textarea{font-family:var(--pw-font-body)}
  </div>
 </div>
 
+<div id="pwPlanOverlay" class="pw-plan-overlay" onclick="if(event.target===this)closeExistingPlan()"><div class="pw-plan-dialog"><header><div><h3>Xếp lịch video sớm nhất</h3><p>Ưu tiên deadline gần, giữ lại hạn gốc để đối chiếu.</p></div><button onclick="closeExistingPlan()">✕</button></header><div id="pwPlanStats"></div><div class="pw-plan-table" id="pwPlanTable"></div><footer><button onclick="closeExistingPlan()">Hủy</button><button id="pwPlanConfirm" onclick="applyExistingPlan()">Lưu lịch mới</button></footer></div></div>
 <div class="brandManager" id="brandManager" onclick="if(event.target===this)closeBrandManager()">
  <div class="brandPanel">
   <div class="brandPanelHead"><h3>Brands</h3><button class="brandClose" onclick="closeBrandManager()">Đóng</button></div>
@@ -1985,15 +1987,15 @@ let tasks=[],brands=[];
 let mode='today',filter='',monthFilter='',reportMonth=iso(new Date()).slice(0,7),monthMenuYear=new Date().getFullYear(),selectedCat='Edit Video',selectedPriority='normal',selectedDate=TODAY,calendarCursor=new Date(),editingId=null,chart,brandChart,postingChart;
 function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function setSaveState(t){$('#saveState').textContent=t}
-function packMeta(note='',sourceUrl='',voiceScript='',priority='normal'){
+function packMeta(note='',sourceUrl='',voiceScript='',priority='normal',originalDue=''){
  const cleanNote=String(note||'').trim(),u=String(sourceUrl||'').trim(),v=String(voiceScript||'').trim(),p=priority||'normal';
- if(!u&&!v&&p==='normal')return cleanNote;
- return '[[PW_META]]'+JSON.stringify({note:cleanNote,sourceUrl:u,voiceScript:v,priority:p});
+ if(!u&&!v&&p==='normal'&&!originalDue)return cleanNote;
+ return '[[PW_META]]'+JSON.stringify({note:cleanNote,sourceUrl:u,voiceScript:v,priority:p,originalDue});
 }
 function unpackMeta(raw=''){
  const x=String(raw||'');
  if(!x.startsWith('[[PW_META]]'))return {note:x,sourceUrl:'',voiceScript:'',priority:'normal'};
- try{const o=JSON.parse(x.slice(11));return {note:o.note||'',sourceUrl:o.sourceUrl||'',voiceScript:o.voiceScript||'',priority:o.priority||'normal'}}catch(e){return {note:x,sourceUrl:'',voiceScript:'',priority:'normal'}}
+ try{const o=JSON.parse(x.slice(11));return {note:o.note||'',sourceUrl:o.sourceUrl||'',voiceScript:o.voiceScript||'',priority:o.priority||'normal',originalDue:o.originalDue||''}}catch(e){return {note:x,sourceUrl:'',voiceScript:'',priority:'normal'}}
 }
 function validHttpUrl(v=''){try{const u=new URL(v);return /^https?:$/.test(u.protocol)}catch(e){return false}}
 
@@ -2022,7 +2024,7 @@ async function loadTasks(){
  ]);
  if(taskRes.error||brandRes.error){setSaveState('● Sync error');console.error(taskRes.error||brandRes.error);return}
  brands=brandRes.data||[];
- tasks=(taskRes.data||[]).map(r=>{const m=unpackMeta(r.note||'');return {id:r.id,name:r.name,date:r.task_date,cat:r.category,note:m.note,sourceUrl:m.sourceUrl,voiceScript:m.voiceScript,priority:m.priority||'normal',done:r.done,brandId:r.brand_id||null,brand:r.brands?.name||'',platforms:Array.isArray(r.platforms)?r.platforms:[]}});
+ tasks=(taskRes.data||[]).map(r=>{const m=unpackMeta(r.note||'');return {id:r.id,name:r.name,date:r.task_date,cat:r.category,note:m.note,sourceUrl:m.sourceUrl,voiceScript:m.voiceScript,priority:m.priority||'normal',originalDue:m.originalDue||'',done:r.done,brandId:r.brand_id||null,brand:r.brands?.name||'',platforms:Array.isArray(r.platforms)?r.platforms:[]}});
  renderBrandSelect();
  setSaveState('● Synced');renderTasks()
 }
@@ -2271,7 +2273,7 @@ function renderTasks(){
      </span>
      <div>
        <div class="taskTitle">${esc(t.name)}</div>
-       ${t.note?`<div class="taskNote">${esc(t.note)}</div>`:''}
+       ${t.note?`<div class="taskNote">${esc(t.note)}</div>`:''}${t.originalDue?`<div class="taskNote">Hạn gốc: ${dateLabel(t.originalDue)}</div>`:''}
        <div class="taskMetaLine">
          ${t.brand?`<div class="taskBrand"><span class="brandDot" style="background:${taskBrandColor(t)}"></span>${esc(t.brand)}</div>`:''}
          ${t.priority&&t.priority!=='normal'?`<span class="priorityBadge ${t.priority}">${t.priority==='urgent'?'Ưu tiên':'Linh hoạt'}</span>`:''}
@@ -2363,7 +2365,7 @@ function closeModal(){$('#overlay').classList.remove('show');$('#calendarPopup')
 async function saveTask(){
  let name=$('#name').value.trim();if(!name)return $('#name').focus();
  setSaveState('● Saving...');
- const payload={name,task_date:selectedDate,category:selectedCat,note:packMeta($('#note').value,$('#sourceUrl').value,$('#voiceScript').value,selectedPriority),brand_id:$('#brandSelect').value?Number($('#brandSelect').value):null,platforms:selectedCat==='Đăng Bài'?selectedPlatforms:[]};
+ const payload={name,task_date:selectedDate,category:selectedCat,note:packMeta($('#note').value,$('#sourceUrl').value,$('#voiceScript').value,selectedPriority,editingId?(tasks.find(t=>t.id===editingId)?.originalDue||''):''),brand_id:$('#brandSelect').value?Number($('#brandSelect').value):null,platforms:selectedCat==='Đăng Bài'?selectedPlatforms:[]};
  let res;
  if(editingId) res=await db.from('tasks').update(payload).eq('id',editingId).select().single();
  else res=await db.from('tasks').insert({...payload,done:false}).select().single();
@@ -2458,32 +2460,40 @@ function bulkNext(){
  addBulkTasks();
 }
 function bulkBack(){$('#bulkPasteView').style.display='block';$('#bulkPreviewView').style.display='none';$('#bulkBack').style.display='none';$('#bulkNext').textContent='Preview →';setBulkStep(1)}
+let planSaving=false;
+function closeExistingPlan(){if(planSaving)return;$('#pwPlanOverlay').classList.remove('show');existingPlan=[]}
 function previewExistingPlan(){
- const month=TODAY.slice(0,7),start=new Date(TODAY+'T12:00:00'),days=[],cursor=new Date(start);
+ const month=TODAY.slice(0,7),cursor=new Date(TODAY+'T12:00:00'),days=[];
  while(iso(cursor).startsWith(month)){if(cursor.getDay()>=1&&cursor.getDay()<=5)days.push(iso(cursor));cursor.setDate(cursor.getDate()+1)}
- if(!days.length){alert('Tháng này không còn ngày làm việc để phân bổ.');return}
- // Keep done tasks and non-video commitments in place. Replan only unfinished videos in this month.
- const candidates=tasks.filter(t=>!t.done&&t.cat==='Edit Video'&&t.date.startsWith(month));
- if(!candidates.length){alert('Không có video chưa hoàn thành trong tháng này.');return}
- const load=Object.fromEntries(days.map(d=>[d,0]));
- tasks.filter(t=>!candidates.includes(t)&&Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>load[t.date]++);
- existingPlan=candidates.map(t=>{const chosen=days.reduce((best,d)=>load[d]<load[best]?d:best,days[0]);load[chosen]++;return {id:t.id,name:t.name,oldDate:t.date,newDate:chosen}});
- const changes=existingPlan.filter(x=>x.oldDate!==x.newDate);
- if(!changes.length){alert('Các video chưa xong đã được phân bố đều trong các ngày còn lại.');return}
- const preview=changes.slice(0,8).map(x=>x.name.slice(0,36)+'\n  '+dateLabel(x.oldDate)+' → '+dateLabel(x.newDate)).join('\n\n');
- if(!confirm('Dự kiến chuyển ngày '+changes.length+'/'+candidates.length+' video CHƯA XONG. Các task đã xong được giữ nguyên.\n\n'+preview+(changes.length>8?'\n\n...và '+(changes.length-8)+' video khác':'')+'\n\nĐồng ý lưu lịch mới vào Supabase?')){existingPlan=[];return}
- applyExistingPlan(changes);
+ const candidates=tasks.filter(t=>!t.done&&t.cat==='Edit Video'&&t.date.startsWith(month)).sort((a,b)=>(a.originalDue||a.date).localeCompare(b.originalDue||b.date)||a.id-b.id);
+ if(!days.length||!candidates.length){alert(!days.length?'Không còn ngày làm việc tháng này.':'Không có video chưa xong trong tháng.');return}
+ const load=Object.fromEntries(days.map(d=>[d,{total:0,video:0}]));
+ tasks.filter(t=>!candidates.includes(t)&&Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>{load[t.date].total++;if(t.cat==='Edit Video')load[t.date].video++});
+ existingPlan=candidates.map(t=>{
+  const deadline=t.originalDue||t.date;
+  let day=days.find(d=>load[d].video<4&&load[d].total<5);
+  if(!day)day=days.find(d=>load[d].video<5&&load[d].total<6);
+  if(!day)day=days.reduce((a,d)=>load[d].total<load[a].total?d:a,days[0]);
+  load[day].total++;load[day].video++;
+  return {id:t.id,name:t.name,oldDate:t.date,newDate:day,deadline,late:day>deadline};
+ });
+ const changes=existingPlan.filter(x=>x.newDate!==x.oldDate),late=existingPlan.filter(x=>x.late);
+ $('#pwPlanStats').textContent=existingPlan.length+' video · '+changes.length+' cần đổi ngày · '+late.length+' nguy cơ trễ hạn gốc. Lịch ưu tiên ngày sớm nhất, tối đa khoảng 4 video/ngày khi còn chỗ.';
+ $('#pwPlanTable').innerHTML='<div class="pw-plan-row pw-plan-heading"><span>Video</span><span>Hạn gốc</span><span>Lịch làm</span></div>'+existingPlan.map(x=>`<div class="pw-plan-row"><strong>${esc(x.name)}</strong><span>${dateLabel(x.deadline)}</span><span class="${x.late?'late':''}">${dateLabel(x.newDate)}${x.late?' ⚠ Trễ':''}</span></div>`).join('');
+ $('#pwPlanConfirm').disabled=!changes.length;$('#pwPlanConfirm').textContent=changes.length?'Lưu lịch '+changes.length+' video':'Không cần đổi ngày';
+ $('#pwPlanOverlay').classList.add('show');
 }
-async function applyExistingPlan(changes){
- setSaveState('● Đang sắp lịch '+changes.length+' video...');
- let savedCount=0;
- for(const change of changes){
-  const {data,error}=await db.from('tasks').update({task_date:change.newDate,updated_at:new Date().toISOString()}).eq('id',change.id).eq('done',false).select('id');
-  if(error||!data?.length){setSaveState('● Lỗi sau '+savedCount+'/'+changes.length+' task');alert('Đã cập nhật '+savedCount+'/'+changes.length+' task. Một số task không lưu được. Hãy tải lại để kiểm tra.');await loadTasks();return}
-  savedCount++;
+async function applyExistingPlan(){
+ if(planSaving)return;const changes=existingPlan.filter(x=>x.newDate!==x.oldDate);if(!changes.length)return;
+ planSaving=true;$('#pwPlanConfirm').disabled=true;let savedCount=0;
+ for(const c of changes){
+  const t=tasks.find(x=>x.id===c.id);if(!t)continue;
+  const note=packMeta(t.note,t.sourceUrl,t.voiceScript,t.priority,c.deadline);
+  const {data,error}=await db.from('tasks').update({task_date:c.newDate,note,updated_at:new Date().toISOString()}).eq('id',c.id).eq('done',false).select('id');
+  if(error||!data?.length){planSaving=false;$('#pwPlanConfirm').disabled=false;await loadTasks();alert('Đã lưu '+savedCount+'/'+changes.length+' task, phần còn lại gặp lỗi.');return}
+  savedCount++;$('#pwPlanConfirm').textContent='Đang lưu '+savedCount+'/'+changes.length;
  }
- existingPlan=[];await loadTasks();setSaveState('✓ Đã chia lịch '+savedCount+' video chưa xong');
- alert('Đã phân bổ lại '+savedCount+' video chưa xong. Video đã hoàn thành không bị thay đổi.');
+ planSaving=false;closeExistingPlan();await loadTasks();setSaveState('✓ Đã xếp sớm '+savedCount+' video');
 }
 function scheduleBulkDates(){
  const date=$('#bulkDate').value||TODAY;
