@@ -2303,7 +2303,7 @@ async function toggle(id){
    console.error(error);
    renderTasks();
    setSaveState('● Sync error');
- }else{setSaveState('● Synced');window.dispatchEvent(new CustomEvent('pw-task-updated',{detail:{id,done:t.done}}));}
+ }else{window.dispatchEvent(new CustomEvent('pw-task-updated',{detail:{id,done:t.done}}));if(t.cat==='Edit Video'){const n=tasks.filter(x=>x.done&&x.cat==='Edit Video'&&x.date.startsWith(TODAY.slice(0,7))).length;setSaveState('✓ KPI: '+n+'/70 · '+Math.min(100,Math.round(n/70*100))+'% · Còn '+Math.max(0,70-n)+' video');}else setSaveState('● Synced');}
 }
 window.pwCompleteFocusTask=async function(id){
  const t=tasks.find(x=>String(x.id)===String(id));if(!t)return {ok:false,message:'Không tìm thấy task'};
@@ -2479,7 +2479,7 @@ function renderBulkBrandMenu(){
  const cur=brands.find(x=>String(x.id)===String(bulkBrandId));$('#bulkBrandBtn').innerHTML=cur?`<span><span class="brandDot" style="background:${cur.color||'#7FA4D6'}"></span> ${esc(cur.name)}</span>`:'Không chọn brand';
 }
 function pickBulkBrand(id){bulkBrandId=id;$('#bulkBrandPicker').classList.remove('open');renderBulkBrandMenu()}
-function pickBulkCat(c){bulkCat=c;$('#bulkCatBtn').textContent=c;$('#bulkCatPicker').classList.remove('open');$('#bulkCatPicker').querySelectorAll('.customSelectOption').forEach(x=>x.classList.toggle('active',x.textContent.trim()===c));renderBulkPlatforms()}
+function pickBulkCat(c){bulkCat=c;$('#bulkCatBtn').textContent=c;$('#bulkCatPicker').classList.remove('open');$('#bulkCatPicker').querySelectorAll('.customSelectOption').forEach(x=>x.classList.toggle('active',x.textContent.trim()===c));renderBulkPlatforms();if($('#bulkPreviewView').style.display!=='none')renderBulkPreview()}
 function renderBulkPlatforms(){
  const block=$('#bulkPlatformBlock'),box=$('#bulkPlatformChoices');block.classList.toggle('show',bulkCat==='Đăng Bài');
  box.innerHTML=PLATFORM_OPTIONS.map(p=>`<button type="button" class="platformChoice ${bulkPlatforms.includes(p)?'active':''}" onclick="toggleBulkPlatform('${p}')">${bulkPlatforms.includes(p)?'✓ ':''}${p}</button>`).join('');
@@ -2503,7 +2503,7 @@ let now=new Date();$('#dateText').textContent=new Intl.DateTimeFormat('en-US',{w
  const menu=document.querySelector('#brandMenu');
  if(picker&&menu&&!picker.contains(e.target))menu.classList.remove('show');
 });
-window.pwStartAfterUnlock=()=>{loadTasks();if(!document.getElementById('pwRemindersScript')){const script=document.createElement('script');script.id='pwRemindersScript';script.src='reminders.js?v=4';document.body.appendChild(script)}if(!document.getElementById('pwFocusScript')){const focus=document.createElement('script');focus.id='pwFocusScript';focus.src='focus.js?v=7';document.body.appendChild(focus)}};
+window.pwStartAfterUnlock=()=>{loadTasks();if(!document.getElementById('pwRemindersScript')){const script=document.createElement('script');script.id='pwRemindersScript';script.src='reminders.js?v=4';document.body.appendChild(script)}if(!document.getElementById('pwFocusScript')){const focus=document.createElement('script');focus.id='pwFocusScript';focus.src='focus.js?v=8';document.body.appendChild(focus)}};
 </script><script id="pwPinPreviewLogic">(function(){
  const form=document.getElementById('pwPinForm'),input=document.getElementById('pwPinInput'),msg=document.getElementById('pwPinMessage'),btn=document.getElementById('pwPinSubmit'),layer=document.getElementById('pwPinLayer');
  const dots=[...document.querySelectorAll('.pw-pin-dot')];const renderDots=()=>dots.forEach((dot,i)=>dot.classList.toggle('filled',i<input.value.length));input.addEventListener('input',renderDots);document.querySelectorAll('[data-pin-key]').forEach(el=>el.addEventListener('click',()=>{const k=el.dataset.pinKey;input.value=k==='back'?input.value.slice(0,-1):(input.value+k).replace(/\D/g,'').slice(0,6);renderDots()}));
