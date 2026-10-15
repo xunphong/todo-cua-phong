@@ -1,4 +1,4 @@
-/* PHONG WORK Focus. Local timer, does not change task data unless user explicitly marks done in main app. */
+/* PHONG WORK Focus. Completion is persisted in Supabase only after explicit user action. */
 (()=>{'use strict';
 const KEY='pw-focus-session-v1',get=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch{return null}};
 let state=get()||{title:'',duration:60,start:0,pausedAt:0,pausedTotal:0,nextStep:'',active:false,finished:false,reminded:false};
@@ -109,6 +109,7 @@ function refreshChoices(){
  }
 }
 window.pwRefreshFocusTasks=refreshChoices;
+window.addEventListener('pw-task-updated',e=>{lastSignature='';if(e.detail?.done&&String(e.detail.id)===String(state.taskId)){state.active=false;state.finished=false;state.taskId=null;state.title='';pickerExpanded=true;save();draw()}refreshChoices()});
 refreshChoices();updatePickerVisibility();
 const choicesInterval=setInterval(refreshChoices,2000);
 const closeImmersive=()=>{immersive.hidden=true;document.body.style.overflow=''};
@@ -144,7 +145,14 @@ root.querySelectorAll('[data-min]').forEach(b=>b.addEventListener('click',()=>{i
 $('pwFocusStart').addEventListener('click',async()=>{if(!state.taskId||!title.value.trim()){status.textContent='Chọn một task chưa hoàn thành ở danh sách phía trên nhé.';saved.scrollIntoView({behavior:'smooth',block:'center'});return}state={...state,title:title.value.trim(),nextStep:step.value,duration:state.duration,start:Date.now(),pausedAt:0,pausedTotal:0,active:true,finished:false,reminded:false};save();draw();if('Notification'in window&&Notification.permission==='default')try{await Notification.requestPermission()}catch{}});
 $('pwFocusPause').addEventListener('click',()=>{if(!state.active)return;if(state.pausedAt){state.pausedTotal+=Date.now()-state.pausedAt;state.pausedAt=0}else state.pausedAt=Date.now();save();draw()});
 $('pwFocusEnd').addEventListener('click',()=>{state.active=false;state.finished=true;save();draw()});
-root.querySelectorAll('[data-review]').forEach(b=>b.addEventListener('click',()=>{const action=b.dataset.review;if(action==='continue'){state={...state,duration:15,start:Date.now(),pausedAt:0,pausedTotal:0,active:true,finished:false,reminded:false};notif15=false;notifiedEnd=false}else{state.active=false;state.finished=false;state.start=0;if(action==='done')status.textContent='Đã ghi nhận kết thúc phiên. Task chính chưa tự đánh dấu hoàn thành.'}save();draw()}));
+root.querySelectorAll('[data-review]').forEach(b=>b.addEventListener('click',async()=>{const action=b.dataset.review;if(action==='continue'){state={...state,duration:15,start:Date.now(),pausedAt:0,pausedTotal:0,active:true,finished:false,reminded:false};notif15=false;notifiedEnd=false}else{if(action==='done'){
+ if(!state.taskId||typeof window.pwCompleteFocusTask!=='function'){status.textContent='Không thể tìm thấy task để đồng bộ. Hãy thử lại.';return}
+ b.disabled=true;const result=await window.pwCompleteFocusTask(state.taskId);b.disabled=false;
+ if(!result.ok){status.textContent='Chưa lưu được: '+(result.message||'Lỗi kết nối');return}
+ state.taskId=null;state.title='';pickerExpanded=true;lastSignature='';refreshChoices();
+ state.active=false;state.finished=false;state.start=0;save();draw();status.textContent='✓ '+result.message;return;
+ }
+ state.active=false;state.finished=false;state.start=0}save();draw()}));
 $('pwFocusCollapse').addEventListener('click',()=>{const x=$('pwFocusContent');x.hidden=!x.hidden;$('pwFocusCollapse').textContent=x.hidden?'Mở rộng':'Thu gọn'});
 function tick(){if(!state.active||state.pausedAt)return;const passed=elapsed();if(passed>=900000&&!state.reminded&&state.duration>15){state.reminded=true;save();if(document.hidden)notify('Bạn còn đang dựng video chứ? Quay lại bước đang làm nhé 🎬')}
 if(remaining()<=0){state.active=false;state.finished=true;save();draw();notify('Hết giờ Focus! Bạn đã làm đến đâu rồi?','complete');if(!document.hidden)root.scrollIntoView({behavior:'smooth',block:'center'})}else clock.textContent=String(Math.floor(Math.ceil(remaining()/1000)/60)).padStart(2,'0')+':'+String(Math.ceil(remaining()/1000)%60).padStart(2,'0')}
