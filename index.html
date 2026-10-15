@@ -34,6 +34,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
 @media(max-width:700px){
  body{background:linear-gradient(160deg,#7fa4d0 0 22%,#b7cbe2 22% 48%,#d7e2ef 48%)}.app{width:100%;padding:18px 12px 90px}.top{padding:0 4px}.summary{grid-template-columns:1fr;padding:18px;gap:17px}.dateBig{font-size:24px}.progressLine strong{font-size:23px}.monthCard{padding:18px 14px}.chartWrap{height:210px;margin-top:8px}.legend{grid-template-columns:1fr 1fr}.legendItem{padding:9px}.tasksCard{padding:17px 13px 8px}.tasksHead{align-items:center}.tabs{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.tab{padding:9px 5px}.controls{grid-template-columns:1fr 1fr}.search{grid-column:1/-1}.monthPicker{min-width:0;width:100%}.monthMenu{left:0;right:auto;width:min(270px,calc(100vw - 26px))}.task{grid-template-columns:31px minmax(0,1fr) 29px;padding:13px 3px}.task .cat,.task .meta{display:none}.taskTitle{font-size:13px}.taskNote{font-size:10px}.more{opacity:1}.tasksViewport{max-height:58vh;padding-right:2px}.groupHead{top:0;padding-top:12px}.modal{position:absolute;left:0;right:0;bottom:0;width:100%;max-width:none;border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);max-height:92vh;overflow:auto}.show .modal{transform:translateY(0)}.overlay{padding:0;align-items:end}.calendarPopup{position:fixed;left:12px;right:12px;top:auto;bottom:210px;width:auto}.choices{grid-template-columns:1fr 1fr}.add{padding:10px 13px}.head{align-items:center}.total strong{font-size:23px}
 }
+.markUnfinished{border:1px solid #b7cbe0;border-radius:9px;background:#eef4fb;color:#3d6698;padding:8px 10px;white-space:nowrap;font-size:11px;font-weight:750;cursor:pointer}.markUnfinished:hover{background:#dceafb}
 </style>
 
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
@@ -2276,7 +2277,7 @@ function renderTasks(){
      </div>
      <div class="cat"><span class="dot" style="background:${COLORS[t.cat]}"></span>${esc(t.cat)}</div>
      <div class="meta ${!t.done&&t.date<TODAY?'overdue':''}">${!t.done&&t.date<TODAY?'OVERDUE · ':''}${dateLabel(t.date)}</div>
-     <button class="more" onclick="event.stopPropagation();editTask(${t.id})">⋯</button>
+     ${mode==='done'&&t.done?`<button class="markUnfinished" type="button" onclick="event.stopPropagation();toggle(${t.id})" title="Chuyển về chưa hoàn thành">↶ Chưa xong</button>`:'<button class="more" onclick="event.stopPropagation();editTask(${t.id})">⋯</button>'}
    </div>`).join('')
  ).join(''):'<div class="empty">Không có task phù hợp.</div>';
  updateDashboard();
