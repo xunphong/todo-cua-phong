@@ -35,6 +35,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:lin
  body{background:linear-gradient(160deg,#7fa4d0 0 22%,#b7cbe2 22% 48%,#d7e2ef 48%)}.app{width:100%;padding:18px 12px 90px}.top{padding:0 4px}.summary{grid-template-columns:1fr;padding:18px;gap:17px}.dateBig{font-size:24px}.progressLine strong{font-size:23px}.monthCard{padding:18px 14px}.chartWrap{height:210px;margin-top:8px}.legend{grid-template-columns:1fr 1fr}.legendItem{padding:9px}.tasksCard{padding:17px 13px 8px}.tasksHead{align-items:center}.tabs{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.tab{padding:9px 5px}.controls{grid-template-columns:1fr 1fr}.search{grid-column:1/-1}.monthPicker{min-width:0;width:100%}.monthMenu{left:0;right:auto;width:min(270px,calc(100vw - 26px))}.task{grid-template-columns:31px minmax(0,1fr) 29px;padding:13px 3px}.task .cat,.task .meta{display:none}.taskTitle{font-size:13px}.taskNote{font-size:10px}.more{opacity:1}.tasksViewport{max-height:58vh;padding-right:2px}.groupHead{top:0;padding-top:12px}.modal{position:absolute;left:0;right:0;bottom:0;width:100%;max-width:none;border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);max-height:92vh;overflow:auto}.show .modal{transform:translateY(0)}.overlay{padding:0;align-items:end}.calendarPopup{position:fixed;left:12px;right:12px;top:auto;bottom:210px;width:auto}.choices{grid-template-columns:1fr 1fr}.add{padding:10px 13px}.head{align-items:center}.total strong{font-size:23px}
 }
 .markUnfinished{border:1px solid #b7cbe0;border-radius:9px;background:#eef4fb;color:#3d6698;padding:8px 10px;white-space:nowrap;font-size:11px;font-weight:750;cursor:pointer}.markUnfinished:hover{background:#dceafb}
+.pw-auto-plan{margin-top:12px;padding:12px;border:1px solid #d5e1ef;background:#eaf1fa;border-radius:12px;color:#345f94}.pw-auto-plan label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}.pw-auto-plan input{accent-color:#5b8def}.pw-auto-plan #bulkScheduleHint{font-size:11px;margin-top:7px}
 </style>
 
 <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
@@ -1877,7 +1878,7 @@ body,button,input,select,textarea{font-family:var(--pw-font-body)}
 <body>
 <div id="pwPinLayer" class="pw-pin-layer" role="dialog" aria-modal="true" aria-labelledby="pwPinHeading"><div class="pw-pin-box"><div class="pw-pin-badge" aria-hidden="true">🔒</div><h1 id="pwPinHeading">PHONG WORK</h1><p>Không gian làm việc riêng tư của bạn</p><form id="pwPinForm" class="pw-pin-form" autocomplete="off"><input id="pwPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" minlength="6" placeholder="••••••" aria-label="Mã PIN gồm sáu chữ số" autocomplete="off"><div class="pw-pin-dots" id="pwPinDots" aria-label="Số chữ số đã nhập"><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span><span class="pw-pin-dot"></span></div><div class="pw-pin-pad" id="pwPinPad"><button type="button" class="pw-pin-num" data-pin-key="1">1</button><button type="button" class="pw-pin-num" data-pin-key="2">2</button><button type="button" class="pw-pin-num" data-pin-key="3">3</button><button type="button" class="pw-pin-num" data-pin-key="4">4</button><button type="button" class="pw-pin-num" data-pin-key="5">5</button><button type="button" class="pw-pin-num" data-pin-key="6">6</button><button type="button" class="pw-pin-num" data-pin-key="7">7</button><button type="button" class="pw-pin-num" data-pin-key="8">8</button><button type="button" class="pw-pin-num" data-pin-key="9">9</button><span></span><button type="button" class="pw-pin-num" data-pin-key="0">0</button><button type="button" class="pw-pin-num" data-pin-key="back" aria-label="Xóa một số">⌫</button></div><button id="pwPinSubmit" type="submit">Mở khóa →</button></form><p class="pw-pin-message" id="pwPinMessage" role="status">Đang kiểm tra quyền truy cập an toàn…</p></div></div><div class="app">
  <div class="top"><div class="logo">PHONG WORK</div><div class="autosave" id="saveState">● Auto saved</div></div>
- <section class="card summary"><div><div class="label">TODAY</div><div class="dateBig" id="dateText"></div><div class="small" id="todayText"></div></div><div><div class="progressLine"><span>Daily progress</span><strong id="todayPct">0%</strong></div><div class="track"><div class="fill" id="todayFill"></div></div></div></section>
+ <section class="card summary"><div><div class="label">TODAY</div><div class="dateBig" id="dateText"></div><div class="small" id="todayText"></div></div><div><div class="progressLine"><span>Monthly KPI · 70 videos</span><strong id="todayPct">0%</strong></div><div class="track"><div class="fill" id="todayFill"></div></div></div></section>
 
  <section class="card tasksCard">
   <div class="tasksHead"><div><h2>Tasks</h2><div class="small">Xem, sửa và quản lý toàn bộ công việc.</div></div><div class="tasksHeadActions"><button class="add secondary" onclick="openBulk()">＋ Add multiple</button><button class="add" onclick="openModal()">＋ Add task</button></div></div>
@@ -1954,8 +1955,9 @@ body,button,input,select,textarea{font-family:var(--pw-font-body)}
    <div class="bulkSetup">
     <div class="bulkSetupBox"><label>BRAND</label><div class="customSelect" id="bulkBrandPicker"><button class="customSelectBtn" id="bulkBrandBtn" onclick="openPortalDropdown(event,'brand')">Không chọn brand</button><div class="customSelectMenu" id="bulkBrandMenu"></div></div></div>
     <div class="bulkSetupBox"><label>CATEGORY</label><div class="customSelect" id="bulkCatPicker"><button class="customSelectBtn" id="bulkCatBtn" onclick="openPortalDropdown(event,'category')">Edit Video</button><div class="customSelectMenu"><button class="customSelectOption active" onclick="pickBulkCat('Edit Video')">Edit Video</button><button class="customSelectOption" onclick="pickBulkCat('Đăng Bài')">Đăng Bài</button><button class="customSelectOption" onclick="pickBulkCat('Design')">Design</button><button class="customSelectOption" onclick="pickBulkCat('Feedback')">Feedback</button></div></div></div>
-    <div class="bulkSetupBox"><label>DATE</label><input class="bulkDate" id="bulkDate" type="date"></div>
+    <div class="bulkSetupBox"><label>NGÀY BẮT ĐẦU</label><input class="bulkDate" id="bulkDate" type="date" onchange="renderBulkPreview()"></div>
    </div>
+   <div class="pw-auto-plan"><label><input id="bulkAutoSchedule" type="checkbox" checked onchange="renderBulkPreview()"> Tự chia đều T2–T6 trong tháng</label><div id="bulkScheduleHint">Tính cả task hiện có; không đổi lịch cũ.</div></div>
    <div class="platformBlock" id="bulkPlatformBlock"><div class="platformLabel">NỀN TẢNG CẦN ĐĂNG</div><div class="platformChoices" id="bulkPlatformChoices"></div></div>
   </div>
   <div class="bulkActions"><div class="bulkCount" id="bulkCount">0 task</div><div><button class="bulkBack" id="bulkBack" style="display:none" onclick="bulkBack()">← Back</button> <button class="bulkAdd" id="bulkNext" onclick="bulkNext()">Preview →</button></div></div>
@@ -2026,8 +2028,8 @@ function dateLabel(v){return new Intl.DateTimeFormat('vi-VN',{day:'2-digit',mont
 function setMode(el){mode=el.dataset.mode;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderTasks();const v=$('#tasksViewport');if(v)v.scrollTop=0}
 function currentMonthDone(){return tasks.filter(t=>t.done&&t.date.startsWith(reportMonth))}
 function updateDashboard(){
- let a=tasks.filter(t=>t.date===TODAY),d=a.filter(t=>t.done).length,p=a.length?Math.round(d/a.length*100):0;
- $('#todayText').textContent=`${d} / ${a.length} tasks completed`;
+ let d=tasks.filter(t=>t.done&&t.cat==='Edit Video'&&t.date.startsWith(TODAY.slice(0,7))).length,p=Math.min(100,Math.round(d/70*100));
+ $('#todayText').textContent=`${d}/70 video · Còn ${Math.max(0,70-d)} video đến mục tiêu tháng`;
  $('#todayPct').textContent=p+'%';
  requestAnimationFrame(()=>$('#todayFill').style.width=p+'%');
 
@@ -2301,8 +2303,17 @@ async function toggle(id){
    console.error(error);
    renderTasks();
    setSaveState('● Sync error');
- }else setSaveState('● Synced');
+ }else{setSaveState('● Synced');window.dispatchEvent(new CustomEvent('pw-task-updated',{detail:{id,done:t.done}}));}
 }
+window.pwCompleteFocusTask=async function(id){
+ const t=tasks.find(x=>String(x.id)===String(id));if(!t)return {ok:false,message:'Không tìm thấy task'};
+ if(t.done)return {ok:true,already:true,message:'Task đã hoàn thành'};
+ const {error}=await db.from('tasks').update({done:true,updated_at:new Date().toISOString()}).eq('id',t.id);
+ if(error)return {ok:false,message:error.message||'Không thể đồng bộ'};
+ t.done=true;renderTasks();window.dispatchEvent(new CustomEvent('pw-task-updated',{detail:{id:t.id,done:true}}));
+ const count=tasks.filter(x=>x.done&&x.cat==='Edit Video'&&x.date.startsWith(TODAY.slice(0,7))).length;
+ return {ok:true,message:t.cat==='Edit Video'?'KPI: '+count+'/70 video · '+Math.min(100,Math.round(count/70*100))+'% · Còn '+Math.max(0,70-count)+' video':'Đã đồng bộ vào Tasks'};
+};
 function quickFilter(c){mode='all';filter=c;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.mode==='all'));$('#filterText').textContent=c;$('#categoryFilterBtn').style.background=COLORS[c]+'22';$('#categoryFilterBtn').style.color=COLORS[c];renderTasks();const v=$('#tasksViewport');if(v)v.scrollTop=0;document.querySelector('.tasksCard').scrollIntoView({behavior:'smooth'})}
 function toggleMenu(){document.querySelector('.filter').classList.toggle('open');$('#menu').classList.toggle('open')}
 function chooseFilter(v,el){
@@ -2406,7 +2417,7 @@ function pickBulkCatPortal(c){pickBulkCat(c);closePortalDropdown()}
 
 function openBulk(){
  bulkItems=[];bulkBrandId='';bulkCat='Edit Video';bulkPlatforms=[];
- $('#bulkPaste').value='';$('#bulkDate').value=TODAY;$('#bulkPasteView').style.display='block';$('#bulkPreviewView').style.display='none';
+ $('#bulkPaste').value='';$('#bulkDate').value=TODAY;$('#bulkAutoSchedule').checked=true;$('#bulkPasteView').style.display='block';$('#bulkPreviewView').style.display='none';
  $('#bulkBack').style.display='none';$('#bulkNext').textContent='Preview →';$('#bulkCount').textContent='0 task';
  setBulkStep(1);renderBulkBrandMenu();pickBulkCat('Edit Video');$('#bulkOverlay').classList.add('show');setTimeout(()=>$('#bulkPaste').focus(),100);
 }
@@ -2444,8 +2455,21 @@ function bulkNext(){
  addBulkTasks();
 }
 function bulkBack(){$('#bulkPasteView').style.display='block';$('#bulkPreviewView').style.display='none';$('#bulkBack').style.display='none';$('#bulkNext').textContent='Preview →';setBulkStep(1)}
+function scheduleBulkDates(){
+ const date=$('#bulkDate').value||TODAY;
+ if(!$('#bulkAutoSchedule').checked)return bulkItems.map(()=>date);
+ const month=date.slice(0,7),cursor=new Date(date+'T12:00:00'),days=[];
+ while(iso(cursor).startsWith(month)){if(cursor.getDay()>=1&&cursor.getDay()<=5)days.push(iso(cursor));cursor.setDate(cursor.getDate()+1)}
+ if(!days.length)return [];
+ const load=Object.fromEntries(days.map(d=>[d,0]));
+ tasks.filter(t=>t.cat===bulkCat&&Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>load[t.date]++);
+ return bulkItems.map(()=>{const chosen=days.reduce((best,d)=>load[d]<load[best]?d:best,days[0]);load[chosen]++;return chosen});
+}
 function renderBulkPreview(){
- $('#bulkPreview').innerHTML='<div class="bulkRow head"><span>#</span><span>Task</span><span>Link</span></div>'+bulkItems.map((x,i)=>`<div class="bulkRow"><span>${i+1}</span><span>${esc(x.name)}</span><span class="bulkUrl">${x.url?esc(x.url):'—'}</span></div>`).join('');
+ const dates=scheduleBulkDates(),auto=$('#bulkAutoSchedule').checked;
+ $('#bulkScheduleHint').textContent=auto?(dates.length?'Đã phân bổ vào '+new Set(dates).size+' ngày làm việc còn lại, có tính task đã có.':'Không còn ngày T2–T6 trong tháng. Chọn ngày bắt đầu khác.'):'Giữ một ngày cho tất cả task.';
+ $('#bulkNext').disabled=auto&&!dates.length;
+ $('#bulkPreview').innerHTML='<div class="bulkRow head"><span>#</span><span>Task</span><span>Ngày dự kiến</span></div>'+bulkItems.map((x,i)=>`<div class="bulkRow"><span>${i+1}</span><span>${esc(x.name)}</span><span class="bulkUrl">${dates[i]?dateLabel(dates[i]):'Chưa xếp được'}</span></div>`).join('');
  $('#bulkCount').textContent=bulkItems.length+' task';renderBulkBrandMenu();renderBulkPlatforms();
 }
 function toggleCustomSelect(id){}
@@ -2464,7 +2488,7 @@ function toggleBulkPlatform(p){bulkPlatforms=bulkPlatforms.includes(p)?bulkPlatf
 async function addBulkTasks(){
  if(!bulkItems.length)return;
  const date=$('#bulkDate').value||TODAY;
- const rows=bulkItems.map(x=>({name:x.name,task_date:date,category:bulkCat,note:packMeta('',x.url,''),brand_id:bulkBrandId?Number(bulkBrandId):null,platforms:bulkCat==='Đăng Bài'?bulkPlatforms:[],done:false}));
+ const dates=scheduleBulkDates();if(dates.length!==bulkItems.length){alert('Không còn ngày T2–T6 trong tháng. Chọn ngày bắt đầu khác.');return}const rows=bulkItems.map((x,i)=>({name:x.name,task_date:dates[i],category:bulkCat,note:packMeta('',x.url,''),brand_id:bulkBrandId?Number(bulkBrandId):null,platforms:bulkCat==='Đăng Bài'?bulkPlatforms:[],done:false}));
  setSaveState('● Adding '+rows.length+' tasks...');
  $('#bulkNext').disabled=true;$('#bulkNext').textContent='Adding...';
  const {error}=await db.from('tasks').insert(rows);
