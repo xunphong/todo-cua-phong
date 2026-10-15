@@ -2024,7 +2024,7 @@ async function loadTasks(){
  ]);
  if(taskRes.error||brandRes.error){setSaveState('● Sync error');console.error(taskRes.error||brandRes.error);return}
  brands=brandRes.data||[];
- tasks=(taskRes.data||[]).map(r=>{const m=unpackMeta(r.note||'');return {id:r.id,name:r.name,date:r.task_date,cat:r.category,note:m.note,sourceUrl:m.sourceUrl,voiceScript:m.voiceScript,priority:m.priority||'normal',originalDue:m.originalDue||'',done:r.done,brandId:r.brand_id||null,brand:r.brands?.name||'',platforms:Array.isArray(r.platforms)?r.platforms:[]}});
+ tasks=(taskRes.data||[]).map(r=>{const m=unpackMeta(r.note||'');return {id:r.id,name:r.name,date:r.task_date,cat:r.category,note:m.note,sourceUrl:m.sourceUrl,voiceScript:m.voiceScript,priority:m.priority||'normal',originalDue:m.originalDue||'',createdAt:r.created_at||'',done:r.done,brandId:r.brand_id||null,brand:r.brands?.name||'',platforms:Array.isArray(r.platforms)?r.platforms:[]}});
  renderBrandSelect();
  setSaveState('● Synced');renderTasks()
 }
@@ -2465,7 +2465,7 @@ function closeExistingPlan(){if(planSaving)return;$('#pwPlanOverlay').classList.
 function previewExistingPlan(){
  const month=TODAY.slice(0,7),cursor=new Date(TODAY+'T12:00:00'),days=[];
  while(iso(cursor).startsWith(month)){if(cursor.getDay()>=1&&cursor.getDay()<=5)days.push(iso(cursor));cursor.setDate(cursor.getDate()+1)}
- const candidates=tasks.filter(t=>!t.done&&t.cat==='Edit Video'&&t.date.startsWith(month)).sort((a,b)=>(a.originalDue||a.date).localeCompare(b.originalDue||b.date)||a.id-b.id);
+ const candidates=tasks.filter(t=>!t.done&&t.cat==='Edit Video'&&t.date.startsWith(month)).sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'')||(a.originalDue||a.date).localeCompare(b.originalDue||b.date)||a.id-b.id);
  if(!days.length||!candidates.length){alert(!days.length?'Không còn ngày làm việc tháng này.':'Không có video chưa xong trong tháng.');return}
  const load=Object.fromEntries(days.map(d=>[d,{total:0,video:0}]));
  tasks.filter(t=>!candidates.includes(t)&&Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>{load[t.date].total++;if(t.cat==='Edit Video')load[t.date].video++});
@@ -2477,8 +2477,8 @@ function previewExistingPlan(){
   load[day].total++;load[day].video++;
   return {id:t.id,name:t.name,oldDate:t.date,newDate:day,deadline,late:day>deadline};
  });
- const changes=existingPlan.filter(x=>x.newDate!==x.oldDate),late=existingPlan.filter(x=>x.late);
- $('#pwPlanStats').textContent=existingPlan.length+' video · '+changes.length+' cần đổi ngày · '+late.length+' nguy cơ trễ hạn gốc. Lịch ưu tiên ngày sớm nhất, tối đa khoảng 4 video/ngày khi còn chỗ.';
+ const changes=existingPlan.filter(x=>x.newDate!==x.oldDate),late=existingPlan.filter(x=>x.late),overloaded=Object.values(load).filter(x=>x.video>4||x.total>5).length;
+ $('#pwPlanStats').textContent=existingPlan.length+' video / '+days.length+' ngày làm việc còn lại · '+changes.length+' cần đổi ngày · '+late.length+' nguy cơ trễ hạn · '+overloaded+' ngày quá tải. Ưu tiên task nhập trước (created_at), xếp sớm nhất; nếu thiếu ngày sẽ cảnh báo.';
  $('#pwPlanTable').innerHTML='<div class="pw-plan-row pw-plan-heading"><span>Video</span><span>Hạn gốc</span><span>Lịch làm</span></div>'+existingPlan.map(x=>`<div class="pw-plan-row"><strong>${esc(x.name)}</strong><span>${dateLabel(x.deadline)}</span><span class="${x.late?'late':''}">${dateLabel(x.newDate)}${x.late?' ⚠ Trễ':''}</span></div>`).join('');
  $('#pwPlanConfirm').disabled=!changes.length;$('#pwPlanConfirm').textContent=changes.length?'Lưu lịch '+changes.length+' video':'Không cần đổi ngày';
  $('#pwPlanOverlay').classList.add('show');
@@ -2503,11 +2503,11 @@ function scheduleBulkDates(){
  if(!days.length)return [];
  const load=Object.fromEntries(days.map(d=>[d,0]));
  tasks.filter(t=>Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>load[t.date]++);
- return bulkItems.map(()=>{const chosen=days.reduce((best,d)=>load[d]<load[best]?d:best,days[0]);load[chosen]++;return chosen});
+ return bulkItems.map(()=>{const chosen=days.find(d=>load[d]<5)||days.reduce((best,d)=>load[d]<load[best]?d:best,days[0]);load[chosen]++;return chosen});
 }
 function renderBulkPreview(){
  const dates=scheduleBulkDates(),auto=$('#bulkAutoSchedule').checked;
- const existing=Object.create(null);tasks.forEach(t=>{existing[t.date]=(existing[t.date]||0)+1});const planned=Object.create(null);dates.forEach(d=>{planned[d]=(planned[d]||0)+1});const overloaded=Object.keys(planned).filter(d=>(existing[d]||0)+planned[d]>5);$('#bulkScheduleHint').textContent=auto?(dates.length?'Chia vào '+new Set(dates).size+' ngày T2–T6. '+(overloaded.length?'⚠ '+overloaded.length+' ngày vượt 5 task (tính cả task cũ); xem kỹ trước khi thêm.':'Không ngày nào vượt 5 task.'):'Không có ngày làm việc hợp lệ trong tháng. Chọn tháng/ngày bắt đầu khác.'):'Tất cả task mới dùng một ngày. Không tự phân bổ.';
+ const existing=Object.create(null);tasks.forEach(t=>{existing[t.date]=(existing[t.date]||0)+1});const planned=Object.create(null);dates.forEach(d=>{planned[d]=(planned[d]||0)+1});const overloaded=Object.keys(planned).filter(d=>(existing[d]||0)+planned[d]>5);$('#bulkScheduleHint').textContent=auto?(dates.length?'Xếp task theo thứ tự đã dán, vào ngày sớm nhất còn chỗ ('+new Set(dates).size+' ngày T2–T6). '+(overloaded.length?'⚠ '+overloaded.length+' ngày vượt 5 task; có thể không kịp tháng.':'Không ngày nào vượt 5 task.'):'Không còn ngày làm việc trong tháng. Chọn ngày khác.'):'Tất cả task dùng cùng một ngày.';
  $('#bulkNext').disabled=auto&&!dates.length;
  $('#bulkPreview').innerHTML='<div class="bulkRow head"><span>#</span><span>Task</span><span>Ngày dự kiến</span></div>'+bulkItems.map((x,i)=>`<div class="bulkRow"><span>${i+1}</span><span>${esc(x.name)}</span><span class="bulkUrl">${dates[i]?dateLabel(dates[i]):'Chưa xếp được'}</span></div>`).join('');
  $('#bulkCount').textContent=bulkItems.length+' task';renderBulkBrandMenu();renderBulkPlatforms();
