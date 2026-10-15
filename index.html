@@ -2465,7 +2465,7 @@ function closeExistingPlan(){if(planSaving)return;$('#pwPlanOverlay').classList.
 function previewExistingPlan(){
  const month=TODAY.slice(0,7),cursor=new Date(TODAY+'T12:00:00'),days=[];
  while(iso(cursor).startsWith(month)){if(cursor.getDay()>=1&&cursor.getDay()<=5)days.push(iso(cursor));cursor.setDate(cursor.getDate()+1)}
- const candidates=tasks.filter(t=>!t.done&&t.cat==='Edit Video'&&t.date.startsWith(month)).sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'')||(a.originalDue||a.date).localeCompare(b.originalDue||b.date)||a.id-b.id);
+ const candidates=tasks.filter(t=>!t.done&&t.cat==='Edit Video'&&t.date.startsWith(month)).sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'')||Number(a.id)-Number(b.id));
  if(!days.length||!candidates.length){alert(!days.length?'Không còn ngày làm việc tháng này.':'Không có video chưa xong trong tháng.');return}
  const load=Object.fromEntries(days.map(d=>[d,{total:0,video:0}]));
  tasks.filter(t=>!candidates.includes(t)&&Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>{load[t.date].total++;if(t.cat==='Edit Video')load[t.date].video++});
