@@ -2029,7 +2029,7 @@ function setMode(el){mode=el.dataset.mode;document.querySelectorAll('.tab').forE
 function currentMonthDone(){return tasks.filter(t=>t.done&&t.date.startsWith(reportMonth))}
 function updateDashboard(){
  let d=tasks.filter(t=>t.done&&t.cat==='Edit Video'&&t.date.startsWith(TODAY.slice(0,7))).length,p=Math.min(100,Math.round(d/70*100));
- $('#todayText').textContent=`${d}/70 video · Còn ${Math.max(0,70-d)} video đến mục tiêu tháng`;
+ $('#todayText').textContent=`${d}/70 video theo lịch tháng · Còn ${Math.max(0,70-d)} video`;
  $('#todayPct').textContent=p+'%';
  requestAnimationFrame(()=>$('#todayFill').style.width=p+'%');
 
@@ -2462,12 +2462,12 @@ function scheduleBulkDates(){
  while(iso(cursor).startsWith(month)){if(cursor.getDay()>=1&&cursor.getDay()<=5)days.push(iso(cursor));cursor.setDate(cursor.getDate()+1)}
  if(!days.length)return [];
  const load=Object.fromEntries(days.map(d=>[d,0]));
- tasks.filter(t=>t.cat===bulkCat&&Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>load[t.date]++);
+ tasks.filter(t=>Object.prototype.hasOwnProperty.call(load,t.date)).forEach(t=>load[t.date]++);
  return bulkItems.map(()=>{const chosen=days.reduce((best,d)=>load[d]<load[best]?d:best,days[0]);load[chosen]++;return chosen});
 }
 function renderBulkPreview(){
  const dates=scheduleBulkDates(),auto=$('#bulkAutoSchedule').checked;
- $('#bulkScheduleHint').textContent=auto?(dates.length?'Đã phân bổ vào '+new Set(dates).size+' ngày làm việc còn lại, có tính task đã có.':'Không còn ngày T2–T6 trong tháng. Chọn ngày bắt đầu khác.'):'Giữ một ngày cho tất cả task.';
+ const existing=Object.create(null);tasks.forEach(t=>{existing[t.date]=(existing[t.date]||0)+1});const planned=Object.create(null);dates.forEach(d=>{planned[d]=(planned[d]||0)+1});const overloaded=Object.keys(planned).filter(d=>(existing[d]||0)+planned[d]>5);$('#bulkScheduleHint').textContent=auto?(dates.length?'Chia vào '+new Set(dates).size+' ngày T2–T6. '+(overloaded.length?'⚠ '+overloaded.length+' ngày vượt 5 task (tính cả task cũ); xem kỹ trước khi thêm.':'Không ngày nào vượt 5 task.'):'Không có ngày làm việc hợp lệ trong tháng. Chọn tháng/ngày bắt đầu khác.'):'Tất cả task mới dùng một ngày. Không tự phân bổ.';
  $('#bulkNext').disabled=auto&&!dates.length;
  $('#bulkPreview').innerHTML='<div class="bulkRow head"><span>#</span><span>Task</span><span>Ngày dự kiến</span></div>'+bulkItems.map((x,i)=>`<div class="bulkRow"><span>${i+1}</span><span>${esc(x.name)}</span><span class="bulkUrl">${dates[i]?dateLabel(dates[i]):'Chưa xếp được'}</span></div>`).join('');
  $('#bulkCount').textContent=bulkItems.length+' task';renderBulkBrandMenu();renderBulkPlatforms();
@@ -2487,7 +2487,6 @@ function renderBulkPlatforms(){
 function toggleBulkPlatform(p){bulkPlatforms=bulkPlatforms.includes(p)?bulkPlatforms.filter(x=>x!==p):[...bulkPlatforms,p];renderBulkPlatforms()}
 async function addBulkTasks(){
  if(!bulkItems.length)return;
- const date=$('#bulkDate').value||TODAY;
  const dates=scheduleBulkDates();if(dates.length!==bulkItems.length){alert('Không còn ngày T2–T6 trong tháng. Chọn ngày bắt đầu khác.');return}const rows=bulkItems.map((x,i)=>({name:x.name,task_date:dates[i],category:bulkCat,note:packMeta('',x.url,''),brand_id:bulkBrandId?Number(bulkBrandId):null,platforms:bulkCat==='Đăng Bài'?bulkPlatforms:[],done:false}));
  setSaveState('● Adding '+rows.length+' tasks...');
  $('#bulkNext').disabled=true;$('#bulkNext').textContent='Adding...';
